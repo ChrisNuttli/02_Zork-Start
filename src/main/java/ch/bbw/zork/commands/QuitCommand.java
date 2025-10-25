@@ -1,8 +1,7 @@
-package ch.bbw.commands;
+package ch.bbw.zork.commands;
 
 import ch.bbw.zork.Command;
 import ch.bbw.zork.Game;
-import ch.bbw.zork.Parser;
 
 import java.util.InputMismatchException;
 
@@ -12,12 +11,16 @@ public class QuitCommand extends Command implements ICommand {
 		super("quit", time);
 	}
 
-	public void processCommand() {
+	public void processCommand(String... args) {
+        if (!this.checkArgValidity(args)) {
+            throw new RuntimeException("Provided args are invalid");
+        }
+
 		System.out.println("Are you sure you want to quit (y/N)?");
 		boolean answerValid = false;
 		do {
 			try {
-				boolean answer = Parser.readYesNo(false);
+				boolean answer = Game.parser.readYesNo(false);
 				if (answer) {
 					Game.quitGame = true;
 				}
@@ -28,13 +31,5 @@ public class QuitCommand extends Command implements ICommand {
 				System.out.printf("An Error has occurred:%n%s", e.getMessage());
 			}
 		} while (!answerValid);
-	}
-
-	public void processCommand(String arg) {
-		this.processCommand();
-	}
-
-	public boolean checkArgValidity(String arg) {
-		return true;
 	}
 }
