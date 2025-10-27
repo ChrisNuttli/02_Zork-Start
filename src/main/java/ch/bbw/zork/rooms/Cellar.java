@@ -1,11 +1,10 @@
 package ch.bbw.zork.rooms;
 
 import ch.bbw.zork.Direction;
-import ch.bbw.zork.Tuple;
+import ch.bbw.zork.interfaces.ExitNorth;
 
 public class Cellar extends Room {
-	public Cellar(Tuple<Integer, Integer> coordinates) {
-		super("cellar", new Direction[]{Direction.NORTH}, coordinates);
-        super.addPotentialNeighbor(Direction.NORTH, Corridor.class, Kitchen.class);
+	public Cellar() {
+		super("cellar", 1);
 	}
 }

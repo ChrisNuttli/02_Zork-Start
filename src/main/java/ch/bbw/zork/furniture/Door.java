@@ -9,25 +9,48 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class Door extends Furniture implements Lockable {
-    private final Tuple<Direction, Room> roomA;
-    private final Tuple<Direction, Room> roomB;
+public abstract class Door extends Furniture implements Lockable {
+	private Room roomA; // The room to the north or east
+    private Room roomB; // The room to the south or west
 
-	public Door(Tuple<Direction, Room> roomA, Tuple<Direction, Room> roomB) {
+    public Door() {
 		super("door", "");
-        this.roomA = roomA;
-        this.roomB = roomB;
 	}
 
-    public Room getRoom(Direction direction) {
-        if (direction != roomA.first && direction != roomB.first) {
-            throw new IllegalArgumentException("Invalid direction");
+    public void setRoomA(Room roomA) {
+        if (roomA != this.roomB) {
+            this.roomA = roomA;
         }
-        else if (direction == roomA.first) {
-            return roomA.second;
+    }
+
+    public void setRoomB(Room roomB) {
+        if (roomB != this.roomA) {
+            this.roomB = roomB;
+        }
+    }
+
+    public Room getRoom(Direction direction) {
+        if (this instanceof DoorNS) {
+            switch (direction) {
+                case NORTH:
+                case EAST:
+                    return roomA;
+                case SOUTH:
+                case WEST:
+                    return roomB;
+            }
         }
         else {
-            return roomB.second;
+            switch (direction) {
+                case NORTH:
+                case EAST:
+                    return roomB;
+                case SOUTH:
+                case WEST:
+                    return roomA;
+            }
         }
+
+        return null;
     }
 }
