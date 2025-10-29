@@ -12,7 +12,5 @@ public class MapCommand extends Command implements ICommand{
         if (!this.checkArgValidity(args)) {
             throw new RuntimeException("Provided args are invalid");
         }
-
-        System.out.print(House.rooms.get(0));
     }
 }

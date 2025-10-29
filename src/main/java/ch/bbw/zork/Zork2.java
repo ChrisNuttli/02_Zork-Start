@@ -25,6 +25,7 @@ public class Zork2 {
         loadCommands();
 		Game zorkgame = new Game();
 		zorkgame.play();
+
 	}
 
     private static void loadCommands() {

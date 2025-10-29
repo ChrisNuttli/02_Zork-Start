@@ -13,8 +13,11 @@ public abstract class Door extends Furniture implements Lockable {
 	private Room roomA; // The room to the north or east
     private Room roomB; // The room to the south or west
 
+    private boolean isLocked;
+
     public Door() {
 		super("door", "");
+        this.isLocked = false;
 	}
 
     public void setRoomA(Room roomA) {
@@ -52,5 +55,13 @@ public abstract class Door extends Furniture implements Lockable {
         }
 
         return null;
+    }
+
+    public boolean isLocked() {
+        return isLocked;
+    }
+
+    public void setLocked(boolean locked) {
+        isLocked = locked;
     }
 }
