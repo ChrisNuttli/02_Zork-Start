@@ -8,4 +8,8 @@ public class Tuple<I, J> {
 		this.first = first;
 		this.second = second;
 	}
+
+    public String toString() {
+        return "(" + first + ", " + second + ")";
+    }
 }

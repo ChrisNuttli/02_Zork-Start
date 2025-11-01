@@ -138,3 +138,9 @@ fetch <item> \
     Description: Retrieves the specified item from the player's backpack if they have one and if the item is in the backpack. \
     Time: 5 min \
     Example: fetch key
+
+## Davadoc parameters
+
+add the following parameters to properly generate the javadocs:
+
+-tag example:m:"An example for how the method is used"
