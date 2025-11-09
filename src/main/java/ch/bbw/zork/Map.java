@@ -27,26 +27,26 @@ public class Map {
         Map.tileWidth = tileWidth;
     }
 
-    public void renderMap() {
-        House house = House.getInstance();
-        String[] mapLines = new String[mapHeight * tileHeight];
-        for (int lineNum = 0; lineNum < mapLines.length; lineNum++) {
-            mapLines[lineNum] = "";
-            int y = Math.floorDiv(lineNum, tileHeight);
-            for (int x = 0; x < this.mapWidth; x++) {
-                Room room = house.getRoom(x, y);
-                if (room == null) {
-                    mapLines[lineNum] += String.format("%-" + tileWidth + "s", " ");
-                }
-                else {
-                    String[] roomBlueprint = room.getBlueprint();
-                    mapLines[lineNum] += roomBlueprint[lineNum % roomBlueprint.length];
-                }
-            }
-        }
-
-        this.mapString = mapLines;
-    }
+//    public void renderMap() {
+//        House house = House.getInstance();
+//        String[] mapLines = new String[mapHeight * tileHeight];
+//        for (int lineNum = 0; lineNum < mapLines.length; lineNum++) {
+//            mapLines[lineNum] = "";
+//            int y = Math.floorDiv(lineNum, tileHeight);
+//            for (int x = 0; x < this.mapWidth; x++) {
+//                Room room = house.getRoom(x, y);
+//                if (room == null) {
+//                    mapLines[lineNum] += String.format("%-" + tileWidth + "s", " ");
+//                }
+//                else {
+//                    String[] roomBlueprint = room.getBlueprint();
+//                    mapLines[lineNum] += roomBlueprint[lineNum % roomBlueprint.length];
+//                }
+//            }
+//        }
+//
+//        this.mapString = mapLines;
+//    }
 
     /**
      * Determines which corner the given coordinates are located in, by returning a Tuple with the directions of
