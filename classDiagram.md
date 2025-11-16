@@ -29,26 +29,12 @@ classDiagram
         CROSS
     }
 
-    class Unlock {
-        <<Interface>>
-        +HashSet<Furniture> getUnlockables()
-    }
-
-    class Contain {
-        <<Interface>>
-        
-        +int getSpaceLimit()
-        +double getWeightLimit()
-        +HashSet<Item> getContents()
-        +void addItem(Item item)
-        +void removeItem(Item item)
-    }
-
     class Zork2 {
         GameState gameState
         int remainingTime
         House house
         Player player
+        Parser parser
 
         +void main()
         +int getRemainingTime()
@@ -58,12 +44,82 @@ classDiagram
     }
 
     class Parser {
+        -Parser instance$
+        -InputStream inputStream
+        -String[] validCommands
+        
+        +Parser getInstance$
+        +String[] getCommandInputs()
+        +boolean isValidInputs()
+        +void executeCommand()
+    }
+    
+    class Lock {
+        String name
+        String description
+        Collectable key
 
+        +boolean tryUnlock(Key key)
     }
 
-    class Item {
-        <<Abstract>>
-        
+    class Collectable {
+        String name
+        String description
+        int space
+        double weight
+        boolean isKey
+    }
+
+    class Storage {
+        -int spaceLimit
+        -double weightLimit
+        -HashSet<Collectable> contents
+
+        +HashSet<Collectable> getContents()
+        +void addCollectable(Collectable item)
+        +void removeCollectable(Collectable item)
+    }
+
+    class Player {
+        -Storage leftHand
+        -Storage rightHand
+        -Storage memory
+        -Storage backpack
+
+        +Collectable getLeftHand()
+        +Collectable getRightHand()
+        +Storage getKnowledge()
+        +Storage getBackpack()
+
+        +void dropCollectable(Collectable item)
+        +void stashCollectable(Collectable item, Storage container)
+        +void fetchCollectable(Collectable item, Storage container)
+    }
+
+    class Furniture {
+        -String name
+        -String description
+        -boolean isDiscovered
+
+        +void check()
+        +String getName()
+        +String getDescription()
+    }
+
+    class Safe {
+        -HashSet<Lock> locks
+
+        +boolean tryUnlock()
+        +boolean isLocked()
+    }
+
+    class Passage {
+        -hashMap<Direction, Room> rooms
+        -Lock lock
+
+        +Room getRoom(Direction direction)
+        +boolean tryUnlock()
+        +boolean isLocked()
     }
 
     class House {
@@ -87,8 +143,8 @@ classDiagram
         -int y
         -boolean discovered
         -HashSet<Furniture> furniture
-        -HashSet<Item> floorItems
         -HashMap<Direction, Door> doors
+        -Storage floor
 
         +String getName()
         +String getDescription()
@@ -98,35 +154,10 @@ classDiagram
         +void setDiscovered()
         
         +HashSet<Furniture> getFurniture()
-        +HashSet<Item> getFloorItems()
-        +Item take(String itemName)
-        +HashSet<Item> scan()
+        +HashSet<Collectable> getFloorCollectables()
+        +Collectable take(String itemName)
         +boolean move(Direction dir)
-    }
-
-    class Storage {
-        -int spaceLimit
-        -double weightLimit
-        -HashSet<Item> contents
-        
-        +void addItem(Item item)
-        +void removeItem(Item item)
-    }
-
-    class Player {
-        -Item leftHand
-        -Item rightHand
-        -Storage knowledge
-        -Storage backpack
-        
-        +Item getLeftHand()
-        +Item getRightHand()
-        +Storage getKnowledge()
-        +Storage getBackpack()
-        
-        +void dropItem(Item item)
-        +void stashItem(Item item, Storage container)
-        +void fetchItem(Item item, Storage container)
+        +void scan()
     }
 
     class Attic
@@ -141,60 +172,39 @@ classDiagram
     class LivingRoom
     class Office
 
-    class Furniture {
-        <<Abstract>>
-        -String name
-        -String description
+    GameState -- Zork2
+    Parser --* Zork2
+    Zork2 "1" --o "1" House
 
-        +HashSet<Item> check()
-        +String getName()
-        +String getDescription()
-    }
+    Player *-- "3" Storage
+    Storage "1" --o Player
     
-    class Bed {
-        -String size
-        -String state
-    }
-    
-    class Chair
-    class Cupboard
-    class Fridge
-    class Sink
-    class Table
-    class Toilet
-    class Wardrobe
-    class WashingMachine
-    class WineRack
-    class Safe
+    Collectable "1" --o "*" Storage
 
-    class Door {
-        -hashMap<Direction, Room> rooms;
-        -boolean locked
-
-        +Room toRoom(Direction direction)
-        +boolean tryUnlock(Key keyItem)
-        +boolean isLocked()
-    }
-    
-    Furniture <|-- Bed
-    Furniture <|-- Chair
-    Furniture <|-- Cupboard
-    Furniture <|-- Fridge
-    Furniture <|-- Sink
-    Furniture <|-- Table
-    Furniture <|-- Toilet
-    Furniture <|-- Wardrobe
-    Furniture <|-- WashingMachine
-    Furniture <|-- WineRack
     Furniture <|-- Safe
+    Furniture o-- Storage
+    Furniture <|-- Passage
+
+    Lock "1..2" --* Safe
+    Lock "1" --* Passage
+    Lock "1" --o Storage
+
+    Passage -- Direction
+    Room "2" *--o "1..4" Passage
     
-    Contain <|.. Bed
-    Contain <|.. Cupboard
-    Contain <|.. Fridge
-    Contain <|.. Sink
-    Contain <|.. Table
-    Contain <|.. Wardrobe
-    Contain <|.. WineRack
-    Contain <|.. Room
-    Contain <|.. Storage
+    RoomShape -- Room
+    Room "10..*" --* "1" House
+    Room "1..2" --o "*" Furniture
+
+    Room <|-- Attic
+    Room <|-- Bathroom
+    Room <|-- Basement
+    Room <|-- Bedroom
+    Room <|-- Cellar
+    Room <|-- Corridor
+    Room <|-- DiningRoom
+    Room <|-- FrontYard
+    Room <|-- Kitchen
+    Room <|-- LivingRoom
+    Room <|-- Office
 ```
