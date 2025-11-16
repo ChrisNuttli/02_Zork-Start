@@ -1,10 +1,14 @@
-package ch.bbw.zork.collectables;
+package ch.bbw.zork;
 
-public abstract class Collectable {
+import java.util.UUID;
+
+public class Furniture {
+    private final String ID;
 	private final String name;
 	private final String description;
 
-	public Collectable(String name, String description) {
+	public Furniture(String name, String description) {
+        this.ID = UUID.randomUUID().toString();
 		this.name = name;
 		this.description = description;
 	}

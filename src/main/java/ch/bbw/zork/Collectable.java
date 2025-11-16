@@ -1,14 +1,10 @@
-package ch.bbw.zork.furniture;
+package ch.bbw.zork;
 
-import java.util.UUID;
-
-public abstract class Furniture {
-    private final String ID;
+public class Collectable {
 	private final String name;
 	private final String description;
 
-	public Furniture(String name, String description) {
-        this.ID = UUID.randomUUID().toString();
+	public Collectable(String name, String description) {
 		this.name = name;
 		this.description = description;
 	}

@@ -1,1 +1,52 @@
-package ch.bbw.zork;import ch.bbw.zork.commands.ICommand;import ch.bbw.zork.furniture.Door;import ch.bbw.zork.rooms.FrontYard;import ch.bbw.zork.rooms.Room;import java.lang.reflect.InvocationTargetException;import java.lang.reflect.Method;import java.util.ArrayList;import java.util.HashMap;/** * Class Game - the main class of the "Zork" game. * * Author:  Michael Kolling, 1.1, March 2000 * refactoring: Rinaldo Lanza, September 2020 */public class Game {	public static Parser parser;	// The Grid of rooms in the house (key is the (x,y) coordinate)//	private final HashMap<Tuple<Integer, Integer>, Room> map;    private House house;	public static boolean quitGame = false;    private Map map;	public Game() {		parser = Parser.getInstance(System.in);        this.house = House.getInstance();	}	/**	 *  Main play routine.  Loops until end of play.	 */	public void play() {		printWelcome();		// Enter the main command loop.  Here we repeatedly read commands and		// execute them until the game is over.		ICommand command;		do {			System.out.printf("%n> ");			String[] inputs = parser.getCommandInputs();			command = Zork2.commands.get(inputs[0]);			System.out.println();			if (inputs.length == 2) {				command.processCommand(inputs[1]);			}			else {				command.processCommand();			}		} while (!quitGame);		System.out.println("Thank you for playing.  Good bye.");	}	private void printWelcome() {		System.out.println("Welcome to Zork!");		System.out.println("Zork is a simple adventure game.");		System.out.println("Type 'help' if you need help.");	}}
+package ch.bbw.zork;
+
+import ch.bbw.zork.enums.GameState;
+
+import java.util.Random;
+
+public class Game {
+    private GameState gameState;
+    private int remainingTime;
+    public static House house;
+    public static Player player;
+    public static String seed;
+
+    public Game() {
+        Random rand = new Random();
+        seed = Parser.padLeft(Integer.toBinaryString(rand.nextInt(Integer.MIN_VALUE, Integer.MAX_VALUE)), '0', 32);
+        Parser.clearScreen();
+        player = new Player();
+        house = new House();
+        remainingTime = 9999;
+        gameState = GameState.NONE;
+
+        house.generateHouse();
+
+        update();
+    }
+
+    private void update() {
+        while (gameState == GameState.NONE) {
+            if (remainingTime <= 0) {
+                gameState = GameState.LOSE;
+                continue;
+            }
+
+            if (!Zork2.parser.executeCommand(Zork2.parser.getCommandInputs())) {
+                System.out.println("Invalid Input");
+            }
+        }
+    }
+
+    public int getRemainingTime() {
+        return remainingTime;
+    }
+
+    public void addTime(int time) {
+        remainingTime += time;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+}
