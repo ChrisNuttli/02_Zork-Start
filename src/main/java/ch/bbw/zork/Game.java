@@ -10,10 +10,11 @@ public class Game {
     public static House house;
     public static Player player;
     public static String seed;
+    public static Random random;
 
     public Game() {
         Random rand = new Random();
-        seed = Parser.padLeft(Integer.toBinaryString(rand.nextInt(Integer.MIN_VALUE, Integer.MAX_VALUE)), '0', 32);
+        setSeed(rand.nextInt());
         Parser.clearScreen();
         player = new Player();
         house = new House();
@@ -21,21 +22,40 @@ public class Game {
         gameState = GameState.NONE;
 
         house.generateHouse();
+        System.out.println("House was Generated");
+//        update();
+    }
 
-        update();
+    public void gameStart() {
+        while (this.gameState == GameState.NONE) {
+            update();
+        }
+
+        if (this.gameState == GameState.WIN) {
+            System.out.println("You won!");
+        }
+        else {
+            System.out.println("Better luck next time!");
+        }
     }
 
     private void update() {
-        while (gameState == GameState.NONE) {
-            if (remainingTime <= 0) {
-                gameState = GameState.LOSE;
-                continue;
-            }
-
-            if (!Zork2.parser.executeCommand(Zork2.parser.getCommandInputs())) {
-                System.out.println("Invalid Input");
-            }
+        if (remainingTime <= 0) {
+            gameState = GameState.LOSE;
         }
+
+        if (!Zork2.parser.executeCommand(Zork2.parser.getCommandInputs())) {
+            System.out.println("Invalid Input");
+        }
+    }
+
+    public void setSeed(int randomInt) {
+        seed = Parser.padLeft(Integer.toBinaryString(randomInt), '0', 30);
+        if (seed.length() > 30) {
+            seed = seed.subSequence(seed.length()-31, seed.length()-1).toString();
+        }
+        int seedInt = Integer.parseInt(Game.seed, 2);
+        random = new Random(seedInt);
     }
 
     public int getRemainingTime() {

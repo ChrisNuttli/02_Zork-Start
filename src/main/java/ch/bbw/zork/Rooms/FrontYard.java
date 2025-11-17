@@ -2,31 +2,44 @@ package ch.bbw.zork.Rooms;
 
 import ch.bbw.zork.Constants;
 import ch.bbw.zork.Game;
+import ch.bbw.zork.Passage;
 import ch.bbw.zork.Room;
+import ch.bbw.zork.enums.Direction;
+import ch.bbw.zork.interfaces.NorthPassage;
 
 import java.util.Random;
 
-public class FrontYard extends Room {
-    public FrontYard(int[] coords) {
-        super("Front Yard", "", coords[0], coords[1]);
+public class FrontYard extends Room implements NorthPassage {
+    private Passage passageNorth;
+
+    public FrontYard() {
+        super("Front Yard", ""); // TODO: Add Description
+        this.setCoordinates(Math.floorDiv(Constants.MAP_WIDTH, 2), Constants.MAP_HEIGHT - 1);
+        initialize();
     }
 
-    public FrontYard(int x, int y) {
-        super("Front Yard", "", x, y);
+    private void initialize() {
+        this.addPossibleNeighbor(Direction.NORTH,"Kitchen");
+        this.addPossibleNeighbor(Direction.NORTH,"Corridor");
     }
 
-    public static int[] getRandomCoordinates() {
-        Random rand = new Random(Integer.parseInt(Game.seed, 2));
-        int roomX = -1;
-        int roomY = -1;
+    @Override
+    public Passage getPassageNorth() {
+        return passageNorth;
+    }
 
-        while (roomX != 0 && roomX != Constants.MAP_WIDTH+1) {
-            roomX = rand.nextInt(0, Constants.MAP_WIDTH);
-        }
-        while (roomY != 0 && roomY != Constants.MAP_HEIGHT+1) {
-            roomY = rand.nextInt(0, Constants.MAP_HEIGHT);
-        }
+    @Override
+    public void setPassageNorth(Passage passageNorth) {
+        this.passageNorth = passageNorth;
+    }
 
-        return new int[]{roomX, roomY};
+    @Override
+    public Room getNeighborNorth() {
+        return this.getNeighbor(Direction.NORTH);
+    }
+
+    @Override
+    public int[] getCoordinatesNorth() {
+        return new int[]{ this.getX(), this.getY()-1 };
     }
 }

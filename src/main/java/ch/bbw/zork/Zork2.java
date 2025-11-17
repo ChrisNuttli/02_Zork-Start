@@ -27,6 +27,7 @@ public class Zork2 {
                 case 1:
                     System.out.println("You selected New Game!");
                     Game game = new Game();
+                    game.gameStart();
                     break;
                 case 2:
                     System.out.println("You selected Exit!");
