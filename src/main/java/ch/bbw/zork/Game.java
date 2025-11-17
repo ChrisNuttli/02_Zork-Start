@@ -23,7 +23,6 @@ public class Game {
 
         house.generateHouse();
         System.out.println("House was Generated");
-//        update();
     }
 
     public void gameStart() {

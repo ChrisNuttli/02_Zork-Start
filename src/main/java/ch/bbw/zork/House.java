@@ -11,58 +11,59 @@ import static ch.bbw.zork.Constants.MAP_HEIGHT;
 import static ch.bbw.zork.Constants.MAP_WIDTH;
 
 public class House {
-    public static HashSet<Room> roomList;
-    public static MapTile[][] mapTiles;
+    public static ArrayList<Room> roomList;
 
     public House() {
-        roomList = new HashSet<>();
-        mapTiles = new MapTile[MAP_HEIGHT][MAP_WIDTH];
-
-        for (int y = 0; y < MAP_HEIGHT; y++) {
-            for (int x = 0; x < MAP_WIDTH; x++) {
-                mapTiles[y][x] = new MapTile(x, y);
-            }
-        }
+        roomList = new ArrayList<>();
     }
 
     public void generateHouse() {
         System.out.println("Please wait. Generating a new map...");
 
-        generateNeighbors();
+        for (int i = 0; i < 1000; i++) {
+            try {
+                generateNeighbors();
+                break;
+            }
+            catch(Exception e) {
+                roomList.forEach(room -> {
+                    System.out.println(room.toString());
+                });
+            }
+        }
 
         System.out.println("Generation Done!");
-
-        if (checkForInvalidPassages()) {
-            System.out.println("Generated Map is not valid!");
-        }
     }
 
     private void generateNeighbors() {
-        for (int y = 0; y < MAP_HEIGHT; y++) {
-            for (int x = 0; x < MAP_WIDTH; x++) {
-                MapTile tile = mapTiles[y][x];
-                ArrayList<Class<? extends Room>> tileEntropy = tile.getEntropy();
-                if (tileEntropy.size() > 1) {
-                    tile.collapse();
-                }
-                else if (tileEntropy.size() == 1 && !tile.isInstantiated()) {
-                    roomList.add(instantiateRoomObject(tileEntropy.get(0).getSimpleName()));
-                    tile.setInstantiated(true);
+        roomList.clear();
+        FrontYard frontYard = new FrontYard();
+        roomList.add(frontYard);
+
+        while (true) {
+            ArrayList<Room> newRoomList = new ArrayList<>(roomList);
+            for (Room room : newRoomList) {
+                HashSet<Direction> missingPassages = room.getMissingNeighborDirections();
+                if (missingPassages.isEmpty()) {continue;}
+                for (Direction direction : missingPassages) {
+                    System.out.println("Generating neighbor for " + room.getName() + " towards " + direction);
+                    String neighborType = room.getRandomNeighbor(direction);
+                    if (neighborType == null) {
+                        throw new RuntimeException("Generation failed");
+                    }
+                    int[] neighborCoords = getNeighborCoordinates(new int[]{room.getX(), room.getY()}, direction);
+                    Room neighborRoom = instantiateRoomObject(neighborType);
+                    neighborRoom.setCoordinates(neighborCoords[0], neighborCoords[1]);
+                    roomList.add(neighborRoom);
                 }
             }
-        }
-    }
 
-    private boolean checkForInvalidPassages() {
-        for (int y = 0; y < MAP_HEIGHT; y++) {
-            for (int x = 0; x < MAP_WIDTH; x++) {
-                if (!mapTiles[y][x].isValid()) {
-                    return false;
-                }
+            if (roomList.size() == newRoomList.size() && !roomList.isEmpty()) {
+                break;
             }
         }
 
-        return true;
+        System.out.println(roomList.size() + " Rooms have been generated!");
     }
 
     private HashSet<String> getRoomNames() {
@@ -109,13 +110,7 @@ public class House {
             return null;
         }
 
-        for (Room room : roomList) {
-            if (room.getX() == x && room.getY() == y) {
-                return room;
-            }
-        }
-
-        return null;
+        return findRoomByCoordinates(x, y);
     }
 
     private void addRoom(Room room) throws IllegalArgumentException {
