@@ -22,7 +22,6 @@ public class Game {
         gameState = GameState.NONE;
 
         house.generateHouse();
-        System.out.println("House was Generated");
     }
 
     public void gameStart() {
@@ -39,11 +38,13 @@ public class Game {
     }
 
     private void update() {
+        Zork2.parser.waitForInput();
+
         if (remainingTime <= 0) {
             gameState = GameState.LOSE;
         }
 
-        if (!Zork2.parser.executeCommand(Zork2.parser.getCommandInputs())) {
+        if (!Zork2.parser.processCommand(Zork2.parser.getCommandInputs())) {
             System.out.println("Invalid Input");
         }
     }

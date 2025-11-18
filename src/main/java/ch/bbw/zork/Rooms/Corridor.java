@@ -1,5 +1,6 @@
 package ch.bbw.zork.Rooms;
 
+import ch.bbw.zork.Furniture;
 import ch.bbw.zork.House;
 import ch.bbw.zork.Passage;
 import ch.bbw.zork.Room;
@@ -18,6 +19,13 @@ public class Corridor extends Room implements NorthPassage, EastPassage, SouthPa
 	public Corridor() {
 		super("Corridor", ""); // TODO: Add Description
 		initialize();
+
+		generateFurniture();
+	}
+
+	private void generateFurniture() {
+		// TODO: Add furniture
+		this.addFurniture(new Furniture("", "", false, true));
 	}
 
 	private void initialize() {

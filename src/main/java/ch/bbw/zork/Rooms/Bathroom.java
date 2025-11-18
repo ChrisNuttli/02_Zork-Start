@@ -1,5 +1,6 @@
 package ch.bbw.zork.Rooms;
 
+import ch.bbw.zork.Furniture;
 import ch.bbw.zork.House;
 import ch.bbw.zork.Passage;
 import ch.bbw.zork.Room;
@@ -11,11 +12,16 @@ public class Bathroom extends Room implements WestPassage {
 
 	public Bathroom() {
 		super("Bathroom", ""); // TODO: Add Description
-		initialize();
+		this.addPossibleNeighbor(Direction.WEST, "Bedroom");
+		this.addPossibleNeighbor(Direction.WEST, "Corridor");
+		this.addPossibleNeighbor(Direction.WEST, "LivingRoom");
+
+		generateFurniture();
 	}
 
-	private void initialize() {
-		this.addPossibleNeighbor(Direction.WEST, "Bedroom");
+	private void generateFurniture() {
+		// TODO: Add furniture
+		this.addFurniture(new Furniture("", "", false, true));
 	}
 
 	@Override

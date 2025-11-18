@@ -1,9 +1,6 @@
 package ch.bbw.zork.Rooms;
 
-import ch.bbw.zork.Constants;
-import ch.bbw.zork.Game;
-import ch.bbw.zork.Passage;
-import ch.bbw.zork.Room;
+import ch.bbw.zork.*;
 import ch.bbw.zork.enums.Direction;
 import ch.bbw.zork.interfaces.NorthPassage;
 
@@ -16,6 +13,13 @@ public class FrontYard extends Room implements NorthPassage {
         super("Front Yard", ""); // TODO: Add Description
         this.setCoordinates(Math.floorDiv(Constants.MAP_WIDTH, 2), Constants.MAP_HEIGHT - 1);
         initialize();
+
+        generateFurniture();
+    }
+
+    private void generateFurniture() {
+        // TODO: Add furniture
+        this.addFurniture(new Furniture("", "", false, true));
     }
 
     private void initialize() {

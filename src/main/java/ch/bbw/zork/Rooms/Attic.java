@@ -1,9 +1,6 @@
 package ch.bbw.zork.Rooms;
 
-import ch.bbw.zork.Constants;
-import ch.bbw.zork.Game;
-import ch.bbw.zork.Passage;
-import ch.bbw.zork.Room;
+import ch.bbw.zork.*;
 import ch.bbw.zork.enums.Direction;
 import ch.bbw.zork.interfaces.SouthPassage;
 
@@ -16,6 +13,15 @@ public class Attic extends Room implements SouthPassage {
 		super("Attic", ""); // TODO: Add Description
 		this.addPossibleNeighbor(Direction.SOUTH,"Corridor");
 		this.addPossibleNeighbor(Direction.SOUTH,"LivingRoom");
+
+		generateFurniture();
+	}
+
+	private void generateFurniture() {
+		this.addFurniture(new Furniture("Boxes", "", false, true));
+		this.addFurniture(new Furniture("Chairs", "", false, false));
+		this.addFurniture(new Furniture("Table", "", true, true));
+		this.addFurniture(new Furniture("Floor", "", false, false));
 	}
 
 	public Passage getPassageSouth() {

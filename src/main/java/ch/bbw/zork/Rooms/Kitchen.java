@@ -1,5 +1,6 @@
 package ch.bbw.zork.Rooms;
 
+import ch.bbw.zork.Furniture;
 import ch.bbw.zork.House;
 import ch.bbw.zork.Passage;
 import ch.bbw.zork.Room;
@@ -16,6 +17,13 @@ public class Kitchen extends Room implements EastPassage, SouthPassage, WestPass
 	public Kitchen() {
 		super("Kitchen", ""); // TODO: Add Description
 		initialize();
+
+		generateFurniture();
+	}
+
+	private void generateFurniture() {
+		// TODO: Add furniture
+		this.addFurniture(new Furniture("", "", false, true));
 	}
 
 	private void initialize() {

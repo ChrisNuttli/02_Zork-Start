@@ -2,6 +2,10 @@ package ch.bbw.zork;
 
 import ch.bbw.zork.Rooms.*;
 import ch.bbw.zork.enums.Direction;
+import ch.bbw.zork.interfaces.EastPassage;
+import ch.bbw.zork.interfaces.NorthPassage;
+import ch.bbw.zork.interfaces.SouthPassage;
+import ch.bbw.zork.interfaces.WestPassage;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,6 +16,7 @@ import static ch.bbw.zork.Constants.MAP_WIDTH;
 
 public class House {
     public static ArrayList<Room> roomList;
+    public static ArrayList<Furniture> furnitureList;
 
     public House() {
         roomList = new ArrayList<>();
@@ -22,7 +27,7 @@ public class House {
 
         for (int i = 0; i < 1000; i++) {
             try {
-                generateNeighbors();
+                generateRooms();
                 break;
             }
             catch(Exception e) {
@@ -32,10 +37,10 @@ public class House {
             }
         }
 
-        System.out.println("Generation Done!");
+        generateDoors();
     }
 
-    private void generateNeighbors() {
+    private void generateRooms() {
         roomList.clear();
         FrontYard frontYard = new FrontYard();
         roomList.add(frontYard);
@@ -66,13 +71,40 @@ public class House {
         System.out.println(roomList.size() + " Rooms have been generated!");
     }
 
-    private HashSet<String> getRoomNames() {
-        HashSet<String> roomNamesMap = new HashSet<>();
+    private void generateDoors() {
         for (Room room : roomList) {
-            roomNamesMap.add(room.getName());
-        }
+            if (room instanceof NorthPassage && ((NorthPassage)room).getPassageNorth() == null) {
+                int[] coords = ((NorthPassage) room).getCoordinatesNorth();
+                Room neighbor = getRoom(coords);
+                Passage door = new Passage(Direction.NORTH, neighbor, Direction.SOUTH, room);
+                ((SouthPassage)neighbor).setPassageSouth(door);
+                ((NorthPassage) room).setPassageNorth(door);
+            }
 
-        return roomNamesMap;
+            if (room instanceof EastPassage && ((EastPassage)room).getPassageEast() == null) {
+                int[] coords = ((EastPassage) room).getCoordinatesEast();
+                Room neighbor = getRoom(coords);
+                Passage door = new Passage(Direction.EAST, neighbor, Direction.WEST, room);
+                ((WestPassage)neighbor).setPassageWest(door);
+                ((EastPassage) room).setPassageEast(door);
+            }
+
+            if (room instanceof SouthPassage && ((SouthPassage)room).getPassageSouth() == null) {
+                int[] coords = ((SouthPassage) room).getCoordinatesSouth();
+                Room neighbor = getRoom(coords);
+                Passage door = new Passage(Direction.SOUTH, neighbor, Direction.NORTH, room);
+                ((NorthPassage)neighbor).setPassageNorth(door);
+                ((SouthPassage) room).setPassageSouth(door);
+            }
+
+            if (room instanceof WestPassage && ((WestPassage)room).getPassageWest() == null) {
+                int[] coords = ((WestPassage) room).getCoordinatesWest();
+                Room neighbor = getRoom(coords);
+                Passage door = new Passage(Direction.WEST, neighbor, Direction.EAST, room);
+                ((EastPassage)neighbor).setPassageEast(door);
+                ((WestPassage) room).setPassageWest(door);
+            }
+        }
     }
 
     private Room instantiateRoomObject(String roomName) {

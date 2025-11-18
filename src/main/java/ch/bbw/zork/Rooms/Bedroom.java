@@ -1,5 +1,6 @@
 package ch.bbw.zork.Rooms;
 
+import ch.bbw.zork.Furniture;
 import ch.bbw.zork.Passage;
 import ch.bbw.zork.Room;
 import ch.bbw.zork.enums.Direction;
@@ -12,14 +13,17 @@ public class Bedroom extends Room implements EastPassage, SouthPassage {
 
 	public Bedroom() {
 		super("Bedroom", ""); // TODO: Add Description
-		initialize();
-	}
-
-	private void initialize() {
 		this.addPossibleNeighbor(Direction.EAST,"Office");
 		this.addPossibleNeighbor(Direction.EAST,"Bathroom");
 		this.addPossibleNeighbor(Direction.SOUTH,"LivingRoom");
 		this.addPossibleNeighbor(Direction.SOUTH,"Corridor");
+
+		generateFurniture();
+	}
+
+	private void generateFurniture() {
+		// TODO: Add furniture
+		this.addFurniture(new Furniture("", "", false, true));
 	}
 
 	@Override
