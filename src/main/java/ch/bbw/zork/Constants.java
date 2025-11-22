@@ -1,6 +1,9 @@
 package ch.bbw.zork;
 
-import ch.bbw.zork.Rooms.*;
+
+import ch.bbw.zork.enums.RoomData;
+
+import static ch.bbw.zork.enums.RoomData.*;
 
 public final class Constants {
     private Constants() {}
@@ -29,18 +32,6 @@ public final class Constants {
     public static final String HORIZONTAL_WALL_PLAIN = new String(new char[ROOM_WIDTH]).replace('\0', WALL_CHAR);
     public static final String HORIZONTAL_WALL_OPEN_DOOR = halfDoorWallHorizontal + openDoorHorizontal + halfDoorWallHorizontal;
     public static final String HORIZONTAL_WALL_LOCKED_DOOR = halfDoorWallHorizontal + lockedDoorHorizontal + halfDoorWallHorizontal;
-    public static final Class<? extends Room>[] ROOM_TYPES = new Class[]{
-            Attic.class,
-            Bathroom.class,
-            Bedroom.class,
-            Cellar.class,
-            Corridor.class,
-            DiningRoom.class,
-            FrontYard.class,
-            Kitchen.class,
-            LivingRoom.class,
-            Office.class
-    };
 
     public static String FLOOR_LINE(char west, char east) {
         return FLOOR_LINE(west, east, " ");
@@ -54,60 +45,16 @@ public final class Constants {
         return west + floorHalf + center + floorHalf + east;
     }
 
-//    public static final String EAST_WALL_WEST_WALL_EMPTY = WALL_CHAR + new String(new char[ROOM_WIDTH-2]).replace('\0', DOOR_LOCKED_CHAR) + WALL_CHAR;
-//    public static final String EAST_WALL_WEST_WALL_PLAYER = WALL_CHAR + halfFloorPlayerLeft + PLAYER_CHAR + halfFloorPlayerRight + WALL_CHAR;
-//    public static final String EAST_DOOR_OPEN_WEST_WALL_EMPTY = DOOR_OPEN_CHAR + new String(new char[ROOM_WIDTH-2]).replace('\0', DOOR_LOCKED_CHAR) + WALL_CHAR;
-//    public static final String EAST_DOOR_OPEN_WEST_WALL_PLAYER = DOOR_OPEN_CHAR + halfFloorPlayerLeft + PLAYER_CHAR + halfFloorPlayerRight + WALL_CHAR;
-//    public static final String EAST_DOOR_LOCKED_WEST_WALL_EMPTY = DOOR_LOCKED_CHAR + new String(new char[ROOM_WIDTH-2]).replace('\0', DOOR_LOCKED_CHAR) + WALL_CHAR;
-//    public static final String EAST_DOOR_LOCKED_WEST_WALL_PLAYER = DOOR_LOCKED_CHAR + halfFloorPlayerLeft + PLAYER_CHAR + halfFloorPlayerRight + WALL_CHAR;
-//
-//    public static final String EAST_WALL_WEST_WALL_DOOR_OPEN = WALL_CHAR + new String(new char[ROOM_WIDTH-2]).replace('\0', DOOR_LOCKED_CHAR) + DOOR_OPEN_CHAR;
-//    public static final String EAST_WALL_WEST_DOOR_OPEN_PLAYER = WALL_CHAR + halfFloorPlayerLeft + PLAYER_CHAR + halfFloorPlayerRight + DOOR_OPEN_CHAR;
-//    public static final String EAST_DOOR_OPEN_WEST_DOOR_OPEN_EMPTY = DOOR_OPEN_CHAR + new String(new char[ROOM_WIDTH-2]).replace('\0', DOOR_LOCKED_CHAR) + DOOR_OPEN_CHAR;
-//    public static final String EAST_DOOR_OPEN_WEST_DOOR_OPEN_PLAYER = DOOR_OPEN_CHAR + halfFloorPlayerLeft + PLAYER_CHAR + halfFloorPlayerRight + DOOR_OPEN_CHAR;
-//    public static final String EAST_DOOR_LOCKED_WEST_DOOR_OPEN_EMPTY = DOOR_LOCKED_CHAR + new String(new char[ROOM_WIDTH-2]).replace('\0', DOOR_LOCKED_CHAR) + DOOR_OPEN_CHAR;
-//    public static final String EAST_DOOR_LOCKED_WEST_DOOR_OPEN_PLAYER = DOOR_LOCKED_CHAR + halfFloorPlayerLeft + PLAYER_CHAR + halfFloorPlayerRight + DOOR_OPEN_CHAR;
-
-
-//    public static String WALL_HORIZONTAL_PLAIN() {
-//        return new String(new char[ROOM_WIDTH]).replace('\0', WALL_CHAR);
-//    }
-
-//    public static String WALL_HORIZONTAL_LOCKED_DOOR() {
-//        char[] resultArray = WALL_HORIZONTAL_PLAIN().toCharArray();
-//        int center = Math.floorDiv(resultArray.length, 2);
-//        for  (int i = center-1; i <= center+1; i++) {
-//            resultArray[i] = DOOR_LOCKED_CHAR;
-//        }
-//
-//        return String.valueOf(resultArray);
-//    }
-
-//    public static String WALL_HORIZONTAL() {
-//        return WALL_HORIZONTAL(WALL_CHAR);
-//    }
-//
-//    public static String WALL_HORIZONTAL(char doorChar) {
-//        char[] resultArray = new String(new char[ROOM_WIDTH]).replace('\0', WALL_CHAR).toCharArray();
-//        int center = Math.floorDiv(resultArray.length, 2);
-//        for  (int i = center-1; i <= center+1; i++) {
-//            resultArray[i] = doorChar;
-//        }
-//
-//        return String.valueOf(resultArray);
-//    }
-//
-//    public static String[] WALL_VERTICAL() {
-//        return WALL_VERTICAL(WALL_CHAR);
-//    }
-//
-//    public static String[] WALL_VERTICAL(char doorChar) {
-//        String[] resultArray = new String(new char[ROOM_HEIGHT-2]).replace('\0', WALL_CHAR).split("");
-//        int center = Math.floorDiv(resultArray.length, 2);
-//        for  (int i = center-1; i <= center+1; i++) {
-//            resultArray[i] = resultArray[i].replace(WALL_CHAR, doorChar);
-//        }
-//
-//        return resultArray;
-//    }
+    public static RoomData[] ROOM_DATA_LIST = new RoomData[]{
+            ATTIC,
+            BASEMENT,
+            BATHROOM,
+            BEDROOM,
+            CELLAR,
+            DINING_ROOM,
+            FRONT_YARD,
+            KITCHEN,
+            LIVING_ROOM,
+            OFFICE,
+    };
 }

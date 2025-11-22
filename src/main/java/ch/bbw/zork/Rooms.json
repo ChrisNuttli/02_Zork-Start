@@ -1,0 +1,99 @@
+{
+  "attic": {
+    "description": "",
+    "doorFrames": [
+      "south"
+    ],
+    "shape": "Dead End"
+  },
+
+  "Basement": {
+    "description": "",
+    "doorFrames": [
+      "east"
+    ],
+    "shape": "Dead End"
+  },
+
+  "Bathroom": {
+    "description": "",
+    "doorFrames": [
+      "west"
+    ],
+    "shape": "Dead End"
+  },
+
+  "Bedroom": {
+    "description": "",
+    "doorFrames": [
+      "east",
+      "south"
+    ],
+    "shape": "corner"
+  },
+
+  "Cellar": {
+    "description": "",
+    "doorFrames": [
+      "north"
+    ],
+    "shape": "Dead End"
+  },
+
+  "Corridor": {
+    "description": "",
+    "doorFrames": [
+      "north",
+      "east",
+      "south",
+      "west"
+    ],
+    "shape": "cross"
+  },
+
+  "Dining Room": {
+    "description": "",
+    "doorFrames": [
+      "east",
+      "west"
+    ],
+    "shape": "straight"
+  },
+
+  "Front Yard": {
+    "description": "",
+    "doorFrames": [
+      "north"
+    ],
+    "shape": "Dead End"
+  },
+
+  "Kitchen": {
+    "description": "",
+    "doorFrames": [
+      "east",
+      "south",
+      "west"
+    ],
+    "shape": "fork"
+  },
+
+  "Living Room": {
+    "description": "",
+    "doorFrames": [
+      "north",
+      "east",
+      "west"
+    ],
+    "shape": "fork"
+  },
+
+  "Office": {
+    "description": "",
+    "doorFrames": [
+      "south",
+      "west"
+    ],
+    "shape": "corner"
+  }
+}

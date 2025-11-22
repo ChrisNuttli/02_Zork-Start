@@ -1,6 +1,5 @@
 package ch.bbw.zork;
 
-import ch.bbw.zork.Rooms.FrontYard;
 import ch.bbw.zork.enums.GameState;
 
 import java.util.Random;
@@ -8,17 +7,21 @@ import java.util.Random;
 public class Game {
     private GameState gameState;
     private int remainingTime;
-    public static House house;
-    public static Player player;
-    public static String seed;
-    public static Random random;
+    private House house;
+    private Player player;
+    private String seed;
+    private Random random;
+    private Parser parser;
 
-    public Game() {
+    public Game(Parser parser) {
         Random rand = new Random();
         setSeed(rand.nextInt());
         Parser.clearScreen();
+        this.parser = parser;
         player = new Player();
-        house = new House();
+        this.parser.setPlayer(player);
+
+        house = new House(this);
         remainingTime = 9999;
         gameState = GameState.NONE;
 
@@ -57,7 +60,7 @@ public class Game {
         if (seed.length() > 30) {
             seed = seed.subSequence(seed.length()-31, seed.length()-1).toString();
         }
-        int seedInt = Integer.parseInt(Game.seed, 2);
+        int seedInt = Integer.parseInt(seed, 2);
         random = new Random(seedInt);
     }
 
@@ -71,5 +74,9 @@ public class Game {
 
     public Player getPlayer() {
         return player;
+    }
+
+    public Random getRandom() {
+        return random;
     }
 }

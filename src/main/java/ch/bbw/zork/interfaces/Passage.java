@@ -1,9 +1,9 @@
 package ch.bbw.zork.interfaces;
 
-import ch.bbw.zork.Transition;
+import ch.bbw.zork.Door;
 import ch.bbw.zork.enums.Direction;
 
 public interface Passage {
-    public Transition getTransition(Direction dir);
-    public void setTransition(Direction dir, Transition transition);
+    public Door getTransition(Direction dir);
+    public void setTransition(Direction dir, Door door);
 }

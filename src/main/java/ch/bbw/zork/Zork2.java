@@ -27,7 +27,7 @@ public class Zork2 {
             switch(parser.chooseOption("Choose an option: ", new String[]{ "New Game", "Exit" })) {
                 case 1:
                     System.out.println("You selected New Game!");
-                    Game game = new Game();
+                    Game game = new Game(parser);
                     game.gameStart();
                     break;
                 case 2:

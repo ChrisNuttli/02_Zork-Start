@@ -4,11 +4,11 @@ import ch.bbw.zork.enums.Direction;
 
 import java.util.HashMap;
 
-public class Transition extends Furniture {
+public class Door extends Furniture {
 	private HashMap<Direction, Room> rooms;
     private Lock lock;
 
-	public Transition(Direction dirA, Room roomA, Direction dirB, Room roomB) {
+	public Door(Direction dirA, Room roomA, Direction dirB, Room roomB) {
 		super("Door", "", false, false);
 		this.rooms = new HashMap<>();
 		this.rooms.put(dirA, roomA);
