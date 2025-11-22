@@ -1,8 +1,7 @@
 package ch.bbw.zork.Rooms;
 
 import ch.bbw.zork.Furniture;
-import ch.bbw.zork.House;
-import ch.bbw.zork.Passage;
+import ch.bbw.zork.Transition;
 import ch.bbw.zork.Room;
 import ch.bbw.zork.enums.Direction;
 import ch.bbw.zork.interfaces.EastPassage;
@@ -10,9 +9,9 @@ import ch.bbw.zork.interfaces.SouthPassage;
 import ch.bbw.zork.interfaces.WestPassage;
 
 public class Kitchen extends Room implements EastPassage, SouthPassage, WestPassage {
-	private Passage passageEast;
-	private Passage passageSouth;
-	private Passage passageWest;
+	private Transition transitionEast;
+	private Transition transitionSouth;
+	private Transition transitionWest;
 
 	public Kitchen() {
 		super("Kitchen", ""); // TODO: Add Description
@@ -29,6 +28,7 @@ public class Kitchen extends Room implements EastPassage, SouthPassage, WestPass
 	private void initialize() {
 		this.addPossibleNeighbor(Direction.EAST,"LivingRoom");
 		this.addPossibleNeighbor(Direction.EAST,"DiningRoom");
+        this.addPossibleNeighbor(Direction.EAST,"Office");
 
 		this.addPossibleNeighbor(Direction.SOUTH,"FrontYard");
 		this.addPossibleNeighbor(Direction.SOUTH,"Cellar");
@@ -39,13 +39,13 @@ public class Kitchen extends Room implements EastPassage, SouthPassage, WestPass
 	}
 
 	@Override
-	public Passage getPassageEast() {
-		return passageEast;
+	public Transition getPassageEast() {
+		return transitionEast;
 	}
 
 	@Override
-	public void setPassageEast(Passage passageEast) {
-		this.passageEast = passageEast;
+	public void setPassageEast(Transition transitionEast) {
+		this.transitionEast = transitionEast;
 	}
 
 	@Override
@@ -59,13 +59,13 @@ public class Kitchen extends Room implements EastPassage, SouthPassage, WestPass
 	}
 
 	@Override
-	public Passage getPassageSouth() {
-		return passageSouth;
+	public Transition getPassageSouth() {
+		return transitionSouth;
 	}
 
 	@Override
-	public void setPassageSouth(Passage passageSouth) {
-		this.passageSouth = passageSouth;
+	public void setPassageSouth(Transition transitionSouth) {
+		this.transitionSouth = transitionSouth;
 	}
 
 	@Override
@@ -79,13 +79,13 @@ public class Kitchen extends Room implements EastPassage, SouthPassage, WestPass
 	}
 
 	@Override
-	public Passage getPassageWest() {
-		return passageWest;
+	public Transition getPassageWest() {
+		return transitionWest;
 	}
 
 	@Override
-	public void setPassageWest(Passage passageWest) {
-		this.passageWest = passageWest;
+	public void setPassageWest(Transition transitionWest) {
+		this.transitionWest = transitionWest;
 	}
 
 	@Override

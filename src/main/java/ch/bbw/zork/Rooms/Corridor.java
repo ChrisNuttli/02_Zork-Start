@@ -1,20 +1,19 @@
 package ch.bbw.zork.Rooms;
 
-import ch.bbw.zork.Furniture;
-import ch.bbw.zork.House;
-import ch.bbw.zork.Passage;
-import ch.bbw.zork.Room;
+import ch.bbw.zork.*;
 import ch.bbw.zork.enums.Direction;
 import ch.bbw.zork.interfaces.EastPassage;
 import ch.bbw.zork.interfaces.NorthPassage;
 import ch.bbw.zork.interfaces.SouthPassage;
 import ch.bbw.zork.interfaces.WestPassage;
 
+import static ch.bbw.zork.Constants.FLOOR_LINE;
+
 public class Corridor extends Room implements NorthPassage, EastPassage, SouthPassage, WestPassage {
-	private Passage passageNorth;
-	private Passage passageEast;
-	private Passage passageSouth;
-	private Passage passageWest;
+	private Transition transitionNorth;
+	private Transition transitionEast;
+	private Transition transitionSouth;
+	private Transition transitionWest;
 
 	public Corridor() {
 		super("Corridor", ""); // TODO: Add Description
@@ -47,13 +46,13 @@ public class Corridor extends Room implements NorthPassage, EastPassage, SouthPa
 	}
 
 	@Override
-	public Passage getPassageNorth() {
-		return passageNorth;
+	public Transition getPassageNorth() {
+		return transitionNorth;
 	}
 
 	@Override
-	public void setPassageNorth(Passage passageNorth) {
-		this.passageNorth = passageNorth;
+	public void setPassageNorth(Transition transitionNorth) {
+		this.transitionNorth = transitionNorth;
 	}
 
 	@Override
@@ -67,13 +66,13 @@ public class Corridor extends Room implements NorthPassage, EastPassage, SouthPa
 	}
 
 	@Override
-	public Passage getPassageEast() {
-		return passageEast;
+	public Transition getPassageEast() {
+		return transitionEast;
 	}
 
 	@Override
-	public void setPassageEast(Passage passageEast) {
-		this.passageEast = passageEast;
+	public void setPassageEast(Transition transitionEast) {
+		this.transitionEast = transitionEast;
 	}
 
 	@Override
@@ -87,13 +86,13 @@ public class Corridor extends Room implements NorthPassage, EastPassage, SouthPa
 	}
 
 	@Override
-	public Passage getPassageSouth() {
-		return passageSouth;
+	public Transition getPassageSouth() {
+		return transitionSouth;
 	}
 
 	@Override
-	public void setPassageSouth(Passage passageSouth) {
-		this.passageSouth = passageSouth;
+	public void setPassageSouth(Transition transitionSouth) {
+		this.transitionSouth = transitionSouth;
 	}
 
 	@Override
@@ -107,13 +106,13 @@ public class Corridor extends Room implements NorthPassage, EastPassage, SouthPa
 	}
 
 	@Override
-	public Passage getPassageWest() {
-		return passageWest;
+	public Transition getPassageWest() {
+		return transitionWest;
 	}
 
 	@Override
-	public void setPassageWest(Passage passageWest) {
-		this.passageWest = passageWest;
+	public void setPassageWest(Transition transitionWest) {
+		this.transitionWest = transitionWest;
 	}
 
 	@Override

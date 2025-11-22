@@ -1,5 +1,6 @@
 package ch.bbw.zork;
 
+import ch.bbw.zork.Rooms.FrontYard;
 import ch.bbw.zork.enums.GameState;
 
 import java.util.Random;
@@ -22,6 +23,8 @@ public class Game {
         gameState = GameState.NONE;
 
         house.generateHouse();
+
+//        if (Zork2.DEBUG) System.out.println(house.getMap());
     }
 
     public void gameStart() {

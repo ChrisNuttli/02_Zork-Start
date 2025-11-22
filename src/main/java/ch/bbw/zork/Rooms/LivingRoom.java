@@ -1,8 +1,7 @@
 package ch.bbw.zork.Rooms;
 
 import ch.bbw.zork.Furniture;
-import ch.bbw.zork.House;
-import ch.bbw.zork.Passage;
+import ch.bbw.zork.Transition;
 import ch.bbw.zork.Room;
 import ch.bbw.zork.enums.Direction;
 import ch.bbw.zork.interfaces.EastPassage;
@@ -10,9 +9,9 @@ import ch.bbw.zork.interfaces.NorthPassage;
 import ch.bbw.zork.interfaces.WestPassage;
 
 public class LivingRoom extends Room implements NorthPassage, EastPassage, WestPassage {
-	private Passage passageNorth;
-	private Passage passageEast;
-	private Passage passageWest;
+	private Transition transitionNorth;
+	private Transition transitionEast;
+	private Transition transitionWest;
 
 	public LivingRoom() {
 		super("LivingRoom", ""); // TODO: Add Description
@@ -41,13 +40,13 @@ public class LivingRoom extends Room implements NorthPassage, EastPassage, WestP
 	}
 
 	@Override
-	public Passage getPassageNorth() {
-		return passageNorth;
+	public Transition getPassageNorth() {
+		return transitionNorth;
 	}
 
 	@Override
-	public void setPassageNorth(Passage passageNorth) {
-		this.passageNorth = passageNorth;
+	public void setPassageNorth(Transition transitionNorth) {
+		this.transitionNorth = transitionNorth;
 	}
 
 	@Override
@@ -61,13 +60,13 @@ public class LivingRoom extends Room implements NorthPassage, EastPassage, WestP
 	}
 
 	@Override
-	public Passage getPassageEast() {
-		return passageEast;
+	public Transition getPassageEast() {
+		return transitionEast;
 	}
 
 	@Override
-	public void setPassageEast(Passage passageEast) {
-		this.passageEast = passageEast;
+	public void setPassageEast(Transition transitionEast) {
+		this.transitionEast = transitionEast;
 	}
 
 	@Override
@@ -81,13 +80,13 @@ public class LivingRoom extends Room implements NorthPassage, EastPassage, WestP
 	}
 
 	@Override
-	public Passage getPassageWest() {
-		return passageWest;
+	public Transition getPassageWest() {
+		return transitionWest;
 	}
 
 	@Override
-	public void setPassageWest(Passage passageWest) {
-		this.passageWest = passageWest;
+	public void setPassageWest(Transition transitionWest) {
+		this.transitionWest = transitionWest;
 	}
 
 	@Override

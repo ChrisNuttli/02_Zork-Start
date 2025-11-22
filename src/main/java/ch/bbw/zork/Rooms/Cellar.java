@@ -1,13 +1,13 @@
 package ch.bbw.zork.Rooms;
 
 import ch.bbw.zork.Furniture;
-import ch.bbw.zork.Passage;
+import ch.bbw.zork.Transition;
 import ch.bbw.zork.Room;
 import ch.bbw.zork.enums.Direction;
 import ch.bbw.zork.interfaces.NorthPassage;
 
 public class Cellar extends Room implements NorthPassage {
-	private Passage passageNorth;
+	private Transition transitionNorth;
 
 	public Cellar() {
 		super("Cellar", ""); // TODO: Add Description
@@ -26,13 +26,13 @@ public class Cellar extends Room implements NorthPassage {
 	}
 
 	@Override
-	public Passage getPassageNorth() {
-		return passageNorth;
+	public Transition getPassageNorth() {
+		return transitionNorth;
 	}
 
 	@Override
-	public void setPassageNorth(Passage passageNorth) {
-		this.passageNorth = passageNorth;
+	public void setPassageNorth(Transition transitionNorth) {
+		this.transitionNorth = transitionNorth;
 	}
 
 	@Override

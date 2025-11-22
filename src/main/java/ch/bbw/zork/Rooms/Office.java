@@ -1,15 +1,15 @@
 package ch.bbw.zork.Rooms;
 
 import ch.bbw.zork.Furniture;
-import ch.bbw.zork.Passage;
+import ch.bbw.zork.Transition;
 import ch.bbw.zork.Room;
 import ch.bbw.zork.enums.Direction;
 import ch.bbw.zork.interfaces.SouthPassage;
 import ch.bbw.zork.interfaces.WestPassage;
 
 public class Office extends Room implements SouthPassage, WestPassage {
-	private Passage passageSouth;
-	private Passage passageWest;
+	private Transition transitionSouth;
+	private Transition transitionWest;
 
 	public Office() {
 		super("Office", ""); // TODO: Add Description
@@ -25,18 +25,20 @@ public class Office extends Room implements SouthPassage, WestPassage {
 	private void initializePossibleNeighbors() {
 		this.addPossibleNeighbor(Direction.SOUTH,"LivingRoom");
 		this.addPossibleNeighbor(Direction.SOUTH,"Corridor");
+
 		this.addPossibleNeighbor(Direction.WEST,"Bedroom");
 		this.addPossibleNeighbor(Direction.WEST,"DiningRoom");
+        this.addPossibleNeighbor(Direction.WEST,"Kitchen");
 	}
 
 	@Override
-	public Passage getPassageSouth() {
-		return passageSouth;
+	public Transition getPassageSouth() {
+		return transitionSouth;
 	}
 
 	@Override
-	public void setPassageSouth(Passage passageSouth) {
-		this.passageSouth = passageSouth;
+	public void setPassageSouth(Transition transitionSouth) {
+		this.transitionSouth = transitionSouth;
 	}
 
 	@Override
@@ -50,13 +52,13 @@ public class Office extends Room implements SouthPassage, WestPassage {
 	}
 
 	@Override
-	public Passage getPassageWest() {
-		return passageWest;
+	public Transition getPassageWest() {
+		return transitionWest;
 	}
 
 	@Override
-	public void setPassageWest(Passage passageWest) {
-		this.passageWest = passageWest;
+	public void setPassageWest(Transition transitionWest) {
+		this.transitionWest = transitionWest;
 	}
 
 	@Override

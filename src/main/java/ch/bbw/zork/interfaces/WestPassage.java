@@ -1,11 +1,11 @@
 package ch.bbw.zork.interfaces;
 
-import ch.bbw.zork.Passage;
+import ch.bbw.zork.Transition;
 import ch.bbw.zork.Room;
 
-public interface WestPassage {
-	public Passage getPassageWest();
-	public void setPassageWest(Passage passage);
+public interface WestPassage extends Passage{
+	public Transition getPassageWest();
+	public void setPassageWest(Transition transition);
 	public Room getNeighborWest();
 	public int[] getCoordinatesWest();
 }

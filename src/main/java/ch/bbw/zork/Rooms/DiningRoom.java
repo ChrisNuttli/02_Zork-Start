@@ -1,16 +1,15 @@
 package ch.bbw.zork.Rooms;
 
 import ch.bbw.zork.Furniture;
-import ch.bbw.zork.House;
-import ch.bbw.zork.Passage;
+import ch.bbw.zork.Transition;
 import ch.bbw.zork.Room;
 import ch.bbw.zork.enums.Direction;
 import ch.bbw.zork.interfaces.EastPassage;
 import ch.bbw.zork.interfaces.WestPassage;
 
 public class DiningRoom extends Room implements EastPassage, WestPassage {
-	private Passage passageEast;
-	private Passage passageWest;
+	private Transition transitionEast;
+	private Transition transitionWest;
 
 	public DiningRoom() {
 		super("DiningRoom", ""); // TODO: Add Description
@@ -33,13 +32,13 @@ public class DiningRoom extends Room implements EastPassage, WestPassage {
 	}
 
 	@Override
-	public Passage getPassageEast() {
-		return passageEast;
+	public Transition getPassageEast() {
+		return transitionEast;
 	}
 
 	@Override
-	public void setPassageEast(Passage passageEast) {
-		this.passageEast = passageEast;
+	public void setPassageEast(Transition transitionEast) {
+		this.transitionEast = transitionEast;
 	}
 
 	@Override
@@ -53,13 +52,13 @@ public class DiningRoom extends Room implements EastPassage, WestPassage {
 	}
 
 	@Override
-	public Passage getPassageWest() {
-		return passageWest;
+	public Transition getPassageWest() {
+		return transitionWest;
 	}
 
 	@Override
-	public void setPassageWest(Passage passageWest) {
-		this.passageWest = passageWest;
+	public void setPassageWest(Transition transitionWest) {
+		this.transitionWest = transitionWest;
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Zork2 {
+    public static boolean DEBUG = true;
     public static Parser parser;
     public final static List<String> validCommands = Arrays.asList("help",
         "move",

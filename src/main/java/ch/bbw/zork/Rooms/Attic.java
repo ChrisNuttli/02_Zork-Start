@@ -4,10 +4,8 @@ import ch.bbw.zork.*;
 import ch.bbw.zork.enums.Direction;
 import ch.bbw.zork.interfaces.SouthPassage;
 
-import java.util.Random;
-
 public class Attic extends Room implements SouthPassage {
-	private Passage passageSouth;
+	private Transition transitionSouth;
 
 	public Attic() {
 		super("Attic", ""); // TODO: Add Description
@@ -24,12 +22,12 @@ public class Attic extends Room implements SouthPassage {
 		this.addFurniture(new Furniture("Floor", "", false, false));
 	}
 
-	public Passage getPassageSouth() {
-		return passageSouth;
+	public Transition getPassageSouth() {
+		return transitionSouth;
 	}
 
-	public void setPassageSouth(Passage passageSouth) {
-		this.passageSouth = passageSouth;
+	public void setPassageSouth(Transition transitionSouth) {
+		this.transitionSouth = transitionSouth;
 	}
 
 	@Override
@@ -41,4 +39,29 @@ public class Attic extends Room implements SouthPassage {
 	public int[] getCoordinatesSouth() {
 		return new int[]{ this.getX(), this.getY()+1 };
 	}
+
+//    public String[] getMapPiece() {
+//        boolean playerInRoom = Game.house.getPlayerLocation() == this;
+//        String[] mapPiece = new String[ROOM_HEIGHT];
+//        mapPiece[0] = HORIZONTAL_WALL_PLAIN;
+//
+//        for (int i = 1; i < ROOM_HEIGHT - 1; i++) {
+//            if (ROOM_NAME_LINE == i) {
+//                mapPiece[i] = FLOOR_LINE('#', '#', this.getName());
+//            } else if (PLAYER_LINE == i && playerInRoom) {
+//                mapPiece[i] = FLOOR_LINE('#', '#', PLAYER_CHAR);
+//            } else {
+//                mapPiece[i] = FLOOR_LINE('#', '#');
+//            }
+//        }
+//
+//        if (this.passageSouth != null && this.passageSouth.isLocked()) {
+//            mapPiece[mapPiece.length - 1] = HORIZONTAL_WALL_LOCKED_DOOR;
+//        }
+//        else {
+//            mapPiece[mapPiece.length - 1] = HORIZONTAL_WALL_OPEN_DOOR;
+//        }
+//
+//        return mapPiece;
+//    }
 }

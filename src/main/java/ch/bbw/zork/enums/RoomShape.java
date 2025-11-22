@@ -14,4 +14,6 @@ public enum RoomShape {
         this.doors = doors;
         this.rotations = rotations;
     }
+
+
 }

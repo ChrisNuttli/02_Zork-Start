@@ -1,14 +1,16 @@
 package ch.bbw.zork.Rooms;
 
-import ch.bbw.zork.Furniture;
-import ch.bbw.zork.House;
-import ch.bbw.zork.Passage;
-import ch.bbw.zork.Room;
+import ch.bbw.zork.*;
 import ch.bbw.zork.enums.Direction;
 import ch.bbw.zork.interfaces.WestPassage;
 
+import static ch.bbw.zork.Constants.*;
+import static ch.bbw.zork.Constants.FLOOR_LINE;
+import static ch.bbw.zork.Constants.PLAYER_CHAR;
+import static ch.bbw.zork.Constants.PLAYER_LINE;
+
 public class Bathroom extends Room implements WestPassage {
-	private Passage passageWest;
+	private Transition transitionWest;
 
 	public Bathroom() {
 		super("Bathroom", ""); // TODO: Add Description
@@ -25,13 +27,13 @@ public class Bathroom extends Room implements WestPassage {
 	}
 
 	@Override
-	public Passage getPassageWest() {
-		return passageWest;
+	public Transition getPassageWest() {
+		return transitionWest;
 	}
 
 	@Override
-	public void setPassageWest(Passage passageWest) {
-		this.passageWest = passageWest;
+	public void setPassageWest(Transition transitionWest) {
+		this.transitionWest = transitionWest;
 	}
 
 	@Override
@@ -49,4 +51,30 @@ public class Bathroom extends Room implements WestPassage {
 	public int[] getCoordinatesWest() {
 		return new int[]{ this.getX()-1, this.getY() };
 	}
+
+    public String[] getMapPiece() {
+        boolean playerInRoom = Game.house.getPlayerLocation() == this;
+        String[] mapPiece = new String[ROOM_HEIGHT];
+        mapPiece[0] = HORIZONTAL_WALL_PLAIN;
+        char westDoorChar = DOOR_OPEN_CHAR;
+        if (this.transitionWest != null && this.transitionWest.isLocked()) {
+            westDoorChar = DOOR_LOCKED_CHAR;
+        }
+
+        for (int i = 1; i < ROOM_HEIGHT - 1; i++) {
+            if (ROOM_NAME_LINE - 1 == i) {
+                mapPiece[i] = FLOOR_LINE(westDoorChar, '#');
+            }
+            else if (ROOM_NAME_LINE == i) {
+                mapPiece[i] = FLOOR_LINE(westDoorChar, '#', this.getName());
+            } else if (PLAYER_LINE == i && playerInRoom) {
+                mapPiece[i] = FLOOR_LINE(westDoorChar, '#', PLAYER_CHAR);
+            } else {
+                mapPiece[i] = FLOOR_LINE('#', '#');
+            }
+        }
+
+        mapPiece[mapPiece.length - 1] = HORIZONTAL_WALL_PLAIN;
+        return mapPiece;
+    }
 }
