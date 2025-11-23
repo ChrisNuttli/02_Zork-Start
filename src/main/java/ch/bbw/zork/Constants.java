@@ -1,8 +1,12 @@
 package ch.bbw.zork;
 
 
+import ch.bbw.zork.enums.FurnitureData;
+import ch.bbw.zork.enums.ItemData;
 import ch.bbw.zork.enums.RoomData;
 
+import static ch.bbw.zork.enums.ItemData.*;
+import static ch.bbw.zork.enums.FurnitureData.*;
 import static ch.bbw.zork.enums.RoomData.*;
 
 public final class Constants {
@@ -23,8 +27,6 @@ public final class Constants {
     private static final String openDoorHorizontal = new String(new char[3]).replace('\0', DOOR_OPEN_CHAR);
     private static final String lockedDoorHorizontal = new String(new char[3]).replace('\0', DOOR_LOCKED_CHAR);
     private static final String halfDoorWallHorizontal = new String(new char[Math.floorDiv(ROOM_WIDTH - 3,2)]).replace('\0', WALL_CHAR);
-    private static final String halfFloorPlayerLeft = new String(new char[Math.floorDiv(ROOM_WIDTH-2, 2)]).replace('\0', ' ');
-    private static final String halfFloorPlayerRight = new String(new char[Math.floorDiv(ROOM_WIDTH-2, 2)-1]).replace('\0',  ' ');
 
     public static final int ROOM_NAME_LINE = (int)Math.ceil((double)ROOM_HEIGHT/2);
     public static final int PLAYER_LINE = ROOM_NAME_LINE + 1;
@@ -56,5 +58,55 @@ public final class Constants {
             KITCHEN,
             LIVING_ROOM,
             OFFICE,
+    };
+
+    public static FurnitureData[] FURNITURE_DATA_LIST = new FurnitureData[]{
+            TABLE,
+            TOILET,
+            BED,
+            SOFA,
+            CHAIR,
+            DESK,
+            WARDROBE,
+            FRIDGE,
+            STOVE,
+            BATHTUB,
+            SINK,
+            SHOWER,
+            MIRROR,
+            NIGHTSTAND,
+            LAMP,
+            SHELF,
+            BOOKCASE,
+            CABINET,
+            WASHING_MACHINE,
+            DRYER,
+            FREEZER,
+            TOOLBOX,
+            LADDER,
+            BOX,
+            BARREL,
+            WINE_RACK,
+            BENCH,
+            COAT_RACK,
+            SHOE_RACK,
+            SIDEBOARD,
+            GRILL,
+            GARDEN_TABLE,
+            GARDEN_CHAIR,
+            FLOWER_POT,
+            COFFEE_TABLE,
+            TV_STAND,
+            FILING_CABINET,
+            COMPUTER,
+    };
+
+    public final static ItemData[] ITEM_DATA_LIST = new ItemData[]{
+            KEY,
+            CROWBAR,
+            BACKPACK,
+            FLASHLIGHT,
+            LOCATION_NOTE,
+            TIME_NOTE
     };
 }

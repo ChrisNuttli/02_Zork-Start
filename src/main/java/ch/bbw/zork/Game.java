@@ -1,6 +1,7 @@
 package ch.bbw.zork;
 
 import ch.bbw.zork.enums.GameState;
+import ch.bbw.zork.enums.RoomData;
 
 import java.util.Random;
 
@@ -8,9 +9,9 @@ public class Game {
     private GameState gameState;
     private int remainingTime;
     private House house;
-    private Player player;
+    private static Player player;
     private String seed;
-    private Random random;
+    private static Random random;
     private Parser parser;
 
     public Game(Parser parser) {
@@ -21,13 +22,18 @@ public class Game {
         player = new Player();
         this.parser.setPlayer(player);
 
-        house = new House(this);
+        house = new House();
         remainingTime = 9999;
         gameState = GameState.NONE;
 
         house.generateHouse();
+        Room frontYard = house.getRoom(RoomData.FRONT_YARD);
+        player.setX(frontYard.getX());
+        player.setY(frontYard.getY());
 
-//        if (Zork2.DEBUG) System.out.println(house.getMap());
+        if (Zork2.DEBUG) System.out.println(house.getMap());
+
+        gameStart();
     }
 
     public void gameStart() {
@@ -72,11 +78,12 @@ public class Game {
         remainingTime += time;
     }
 
-    public Player getPlayer() {
+    public static Player getPlayer() {
         return player;
     }
 
-    public Random getRandom() {
+    public static Random getRandom() {
         return random;
     }
+
 }

@@ -1,31 +1,28 @@
 package ch.bbw.zork;
 
-import ch.bbw.zork.enums.Direction;
-import ch.bbw.zork.enums.RoomData;
-import ch.bbw.zork.interfaces.EastPassage;
-import ch.bbw.zork.interfaces.NorthPassage;
-import ch.bbw.zork.interfaces.SouthPassage;
-import ch.bbw.zork.interfaces.WestPassage;
+import ch.bbw.zork.Items.*;
+import ch.bbw.zork.Items.Crowbar;
+import ch.bbw.zork.Items.Item;
+import ch.bbw.zork.enums.*;
+import ch.bbw.zork.interfaces.Uncover;
+import ch.bbw.zork.interfaces.Unlock;
 
 import java.util.*;
 
 import static ch.bbw.zork.Constants.*;
 
 public class House {
-    public ArrayList<Room> roomList;
-    public ArrayList<Furniture> furnitureList;
-    private Room playerLocation;
-    private Game game;
+    private ArrayList<Room> roomList;
 
-    public House(Game game) {
-        this.game = game;
+    public House() {
         roomList = new ArrayList<>();
     }
 
     public void generateHouse() {
         System.out.println("Please wait. Generating a new map...");
 
-        for (int i = 0; i < 10000; i++) {
+        int i = 1;
+        while (true) {
             try {
                 generateRooms();
                 if (roomList.size() < ROOM_DATA_LIST.length) {
@@ -69,17 +66,75 @@ public class House {
 //                    System.out.println(i + " " + e.getMessage());
 //                }
             }
+            i++;
         }
+
+
+        generateFurniture();
+        generateItems();
+
+
 
         if (Zork2.DEBUG) {
             System.out.printf(getMap());
-            System.out.println("");
+        }
+        System.out.println("Done Generating");
+    }
+
+    private void generateSafe() {
+        int maxDepthScore = 0;
+        for (Room room : roomList) {
+            maxDepthScore = Math.max(maxDepthScore, room.getDepthScore());
+        }
+
+        ArrayList<Room> safeRooms = new ArrayList<>(roomList);
+        int roomIndex = 0;
+
+        while (!safeRooms.isEmpty()) {
+            try {
+                roomIndex = new Random().nextInt(safeRooms.size());
+                if (safeRooms.get(roomIndex).getDepthScore() < Math.floorDiv(maxDepthScore, 2)) {
+                    throw new RuntimeException("Room is not deep enough");
+                }
+
+                Room safeRoom = safeRooms.get(roomIndex);
+                ArrayList<Furniture> furnitureList = safeRoom.getFurnitureList();
+                int furnitureIndex = 0;
+                FurnitureData fd = null;
+                while (fd.getHidingSpot().isEmpty() && !furnitureList.isEmpty()) {
+                    if (fd != null) {
+                        furnitureList.remove(furnitureList.get(furnitureIndex));
+                    }
+                    furnitureIndex = new Random().nextInt(furnitureList.size());
+                    fd = furnitureList.get(furnitureIndex).getFurnitureData();
+                }
+
+                if (furnitureList.isEmpty()) {
+                    throw new RuntimeException("No valid furniture found in room!");
+                }
+
+                Furniture safe = new Furniture(FurnitureData.SAFE);
+                Lock keyLock = new Lock(LockType.KEY_HOLE);
+                Lock codeLock = new Lock(LockType.NUMPAD);
+
+                LocationNote locationNote = safe.generatLocationNote(fd);
+                Key safeKey = keyLock.getKey();
+                String safeCode = codeLock.getCode();
+                Note safeCodeNote = new Note("Note", String.format("safe: %s", safeCode));
+
+                hideItem(safeKey);
+                hideItem(safeCodeNote);
+                hideItem(locationNote);
+            }
+            catch(Exception e) {
+                safeRooms.remove(roomIndex);
+            }
         }
     }
 
     private void generateRooms() {
         roomList.clear();
-        Room frontYard = new Room((int)Math.ceil((double)MAP_WIDTH / 2), MAP_HEIGHT-1, RoomData.FRONT_YARD, this, this.game);
+        Room frontYard = new Room((int)Math.ceil((double)MAP_WIDTH / 2), MAP_HEIGHT-1, RoomData.FRONT_YARD, this);
         roomList.add(frontYard);
 
         ArrayList<Room> rooms;
@@ -100,7 +155,7 @@ public class House {
                     RoomData neighborData = room.decideNeighbor(direction);
                     if (neighborData != null) {
                         int[] coordinates = getNeighborCoordinates(room.getX(), room.getY(), direction);
-                        roomList.add(new Room(coordinates[0], coordinates[1], neighborData, this, this.game));
+                        roomList.add(new Room(coordinates[0], coordinates[1], neighborData, this));
                     }
                     else {
                         throw new RuntimeException("No suitable candidate was found");
@@ -143,6 +198,59 @@ public class House {
                 }
             }
         }
+    }
+
+    private void generateFurniture() {
+        for (Room room : roomList) {
+            RoomData roomData = room.getRoomData();
+            ArrayList<FurnitureData> furnitureDataList = getFurnitureDataForRoom(roomData);
+            int min = furnitureDataList.size() / 2;
+            int furnitureCount = Game.getRandom().nextInt((furnitureDataList.size()+1) - min) + min;
+            while (room.getFurnitureList().size() < furnitureCount) {
+                int randomIndex = Game.getRandom().nextInt(furnitureDataList.size());
+                FurnitureData furnitureData = furnitureDataList.get(randomIndex);
+                if (room.getFurnitureCount(furnitureData) < furnitureData.getMax(roomData)) {
+                    room.addFurniture(furnitureData);
+                }
+            }
+        }
+    }
+
+    private void generateItems() {
+        ArrayList<Item> itemList = new ArrayList<>();
+        for (ItemData itemData : ITEM_DATA_LIST) {
+            if (itemData == ItemData.KEY || itemData == ItemData.LOCATION_NOTE) {continue;}
+            if (itemData.getSpawnProbability() >= Game.getRandom().nextInt(100)) {
+                int min = Math.max(1, itemData.getMinSpawns());
+                int spawnCount = Game.getRandom().nextInt(itemData.getMaxSpawns()+1 - min) + min;
+                for (int i = 0; i < spawnCount; i++) {
+                    switch (itemData) {
+                        case BACKPACK:
+                            itemList.add(new Backpack());
+                            break;
+                        case FLASHLIGHT:
+                            itemList.add(new Flashlight());
+                            break;
+                        case CROWBAR:
+                            itemList.add(new Crowbar());
+                            break;
+                        case TIME_NOTE:
+                            itemList.add(new TimeNote());
+                    }
+                }
+            }
+        }
+    }
+
+    private ArrayList<FurnitureData> getFurnitureDataForRoom(RoomData roomData) {
+        ArrayList<FurnitureData> furnitureData = new ArrayList<>();
+        for (FurnitureData fd : FURNITURE_DATA_LIST) {
+            if (fd.getMax(roomData) > 0) {
+                furnitureData.add(fd);
+            }
+        }
+
+        return furnitureData;
     }
 
     public ArrayList<RoomData> getCandidatesForCoodinates(int[] coordinates) {
@@ -299,13 +407,26 @@ public class House {
         return null;
     }
 
-    public Room getPlayerLocation() {
-        return playerLocation;
+    public Room getRoom(RoomData roomData) {
+        for (Room room : roomList) {
+            if (room.getRoomData().equals(roomData)) {
+                return room;
+            }
+        }
+
+        return null;
     }
 
-    public void setPlayerLocation(Room playerLocation) {
-        this.playerLocation = playerLocation;
+    public Room getPlayerLocation() {
+        Player player = Game.getPlayer();
+        int x =  player.getX();
+        int y = player.getY();
+        return getRoom(x, y);
     }
+//
+//    public void setPlayerLocation(Room playerLocation) {
+//        this.playerLocation = playerLocation;
+//    }
 
     public ArrayList<RoomData> getUsedRoomTypes() {
         ArrayList<RoomData> roomTypeList = new ArrayList<>();
@@ -314,6 +435,29 @@ public class House {
         }
 
         return roomTypeList;
+    }
+
+    private void hideItem(Item item) {
+        int roomIndex = 0;
+        ArrayList<Room> itemHideRooms = new ArrayList<>(roomList);
+        boolean success = false;
+
+        while (!itemHideRooms.isEmpty()) {
+            try {
+                roomIndex = Game.getRandom().nextInt(itemHideRooms.size());
+                Room itemRoom = itemHideRooms.get(roomIndex);
+                itemRoom.hideItem(item);
+                success = true;
+                break;
+            }
+            catch(Exception e) {
+                System.err.println(e.getMessage());
+            }
+        }
+
+        if (!success) {
+            throw new  RuntimeException("Cannot hide this item.");
+        }
     }
 
     public String getMap() {

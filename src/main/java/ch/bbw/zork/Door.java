@@ -1,15 +1,16 @@
 package ch.bbw.zork;
 
+import ch.bbw.zork.Items.Item;
 import ch.bbw.zork.enums.Direction;
+import ch.bbw.zork.interfaces.Unlock;
 
 import java.util.HashMap;
 
-public class Door extends Furniture {
+public class Door {
 	private HashMap<Direction, Room> rooms;
     private Lock lock;
 
 	public Door(Direction dirA, Room roomA, Direction dirB, Room roomB) {
-		super("Door", "", false, false);
 		this.rooms = new HashMap<>();
 		this.rooms.put(dirA, roomA);
 		this.rooms.put(dirB, roomB);
@@ -32,7 +33,7 @@ public class Door extends Furniture {
         return this.lock.isLocked();
     }
 
-    public boolean tryUnlock(Collectable key) {
+    public boolean tryUnlock(Unlock key) {
         if (this.lock == null) {
             throw new IllegalStateException("This passage does not have a lock");
         }
