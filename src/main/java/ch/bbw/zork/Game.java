@@ -3,16 +3,17 @@ package ch.bbw.zork;
 import ch.bbw.zork.enums.GameState;
 import ch.bbw.zork.enums.RoomData;
 
+import java.util.InputMismatchException;
 import java.util.Random;
 
 public class Game {
     private GameState gameState;
-    private int remainingTime;
-    private House house;
+    private static int remainingTime;
+    private static House house;
     private static Player player;
     private String seed;
     private static Random random;
-    private Parser parser;
+    private static Parser parser;
 
     public Game(Parser parser) {
         Random rand = new Random();
@@ -31,12 +32,11 @@ public class Game {
         player.setX(frontYard.getX());
         player.setY(frontYard.getY());
 
-        if (Zork2.DEBUG) System.out.println(house.getMap());
-
         gameStart();
     }
 
     public void gameStart() {
+        System.out.println("You stand in the Front Yard of your Victims house.");
         while (this.gameState == GameState.NONE) {
             update();
         }
@@ -50,14 +50,15 @@ public class Game {
     }
 
     private void update() {
-        Zork2.parser.waitForInput();
+        try {
+            Zork2.parser.waitForInput();
+        }
+        catch(InputMismatchException e) {
+            System.out.println("Invalid command.");
+        }
 
         if (remainingTime <= 0) {
             gameState = GameState.LOSE;
-        }
-
-        if (!Zork2.parser.processCommand(Zork2.parser.getCommandInputs())) {
-            System.out.println("Invalid Input");
         }
     }
 
@@ -70,11 +71,11 @@ public class Game {
         random = new Random(seedInt);
     }
 
-    public int getRemainingTime() {
+    public static int getRemainingTime() {
         return remainingTime;
     }
 
-    public void addTime(int time) {
+    public static void addTime(int time) {
         remainingTime += time;
     }
 
@@ -86,4 +87,11 @@ public class Game {
         return random;
     }
 
+    public static House getHouse() {
+        return house;
+    }
+
+    public static Parser getParser() {
+        return parser;
+    }
 }

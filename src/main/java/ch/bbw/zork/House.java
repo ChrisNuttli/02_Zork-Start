@@ -423,10 +423,6 @@ public class House {
         int y = player.getY();
         return getRoom(x, y);
     }
-//
-//    public void setPlayerLocation(Room playerLocation) {
-//        this.playerLocation = playerLocation;
-//    }
 
     public ArrayList<RoomData> getUsedRoomTypes() {
         ArrayList<RoomData> roomTypeList = new ArrayList<>();

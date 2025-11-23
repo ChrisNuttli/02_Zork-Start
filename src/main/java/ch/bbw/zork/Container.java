@@ -10,6 +10,7 @@ public class Container implements Storage {
     private final String storageID;
     private final HashMap<String, Item> contents;
     private final int spaceLimit;
+    private final int slots;
     private final double weightLimit;
     private Lock lock;
 
@@ -18,10 +19,15 @@ public class Container implements Storage {
     }
 
     public Container(int spaceLimit, double weightLimit) {
+        this(Integer.MAX_VALUE, Double.MAX_VALUE, Integer.MAX_VALUE);
+    }
+
+    public Container(int spaceLimit, double weightLimit, int slots) {
         this.spaceLimit = spaceLimit;
         this.weightLimit = weightLimit;
         this.contents = new HashMap<>();
         this.storageID = UUID.randomUUID().toString();
+        this.slots = slots;
     }
 
     @Override
@@ -31,6 +37,10 @@ public class Container implements Storage {
 
     @Override
     public void stashItem(Item item) {
+        if (this.slots - this.getContents().size() < 0) {
+            throw new RuntimeException("Cannot hold any more items");
+        }
+
         if (getAvailableSpace() < item.getSpace()) {
             throw new RuntimeException("Cannot stash this item. Not enough space.");
         }

@@ -18,6 +18,15 @@ public final class Constants {
     public static final int ROOM_HEIGHT = 15;
     public static final int ROOM_WIDTH = 25;
 
+    public static final int STARTING_TIME = 300;
+    public static final int MOVE_TIME = 5;
+    public static final int SCAN_TIME = 10;
+    public static final int CHECK_TIME = 5;
+    public static final int TAKE_TIME = 2;
+    public static final int FETCH_TIME = 5;
+    public static final int STASH_TIME = 5;
+    public static final int DROP_TIME = 2;
+
     public static final char WALL_CHAR = '#';
     public static final char DOOR_OPEN_CHAR = ' ';
     public static final char DOOR_LOCKED_CHAR = 'X';
