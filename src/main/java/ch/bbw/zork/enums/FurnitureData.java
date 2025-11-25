@@ -438,6 +438,14 @@ public enum FurnitureData {
                     }
             },
             new boolean[]{true}
+    ),
+    FLOOR(
+            "floor",
+            "The room floor",
+            "",
+            new String[] { "on the floor" },
+            new ItemData[][] { new ItemData[] {} },
+            new boolean[] {false}
     );
 
     private final String name;

@@ -2,6 +2,7 @@ package ch.bbw.zork.interfaces;
 
 import ch.bbw.zork.Items.Item;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public interface Storage {

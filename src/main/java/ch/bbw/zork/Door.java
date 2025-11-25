@@ -1,6 +1,5 @@
 package ch.bbw.zork;
 
-import ch.bbw.zork.Items.Item;
 import ch.bbw.zork.enums.Direction;
 import ch.bbw.zork.interfaces.Unlock;
 
@@ -45,5 +44,13 @@ public class Door {
             System.out.println(e.getMessage());
             return true;
         }
+    }
+
+    public Room traverse(Direction direction) {
+        if (this.lock != null && this.lock.isLocked()) {
+            throw new RuntimeException("The door seems to be locked.");
+        }
+
+        return this.rooms.get(direction);
     }
 }

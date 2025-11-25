@@ -7,20 +7,18 @@ import ch.bbw.zork.enums.LockType;
 import ch.bbw.zork.interfaces.Hidden;
 import ch.bbw.zork.interfaces.Uncover;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 public class Furniture implements Hidden {
     private final String furnitureID;
 	private final String name;
 	private final String description;
 	private HashMap<String, Container> storage;
-    private HashMap<Integer, Item> checkedItemsList;
     private final FurnitureData furnitureData;
     private final ArrayList<String> uncoverIDs;
     private boolean uncovered;
     private Lock lock;
+    private HashSet<Item> checkedItems;
 
     public Furniture(FurnitureData furnitureData) {
         this.furnitureID = UUID.randomUUID().toString();
@@ -34,6 +32,7 @@ public class Furniture implements Hidden {
             }
         }
         this.uncoverIDs = new ArrayList<>();
+        this.checkedItems = new HashSet<>();
     }
 
 	public String getName() {
@@ -48,6 +47,22 @@ public class Furniture implements Hidden {
     public String getDescription() {
 		return description;
 	}
+
+    public Container getContainer(String containerName) {
+        return this.storage.get(containerName);
+    }
+
+    public Container getContainer() {
+        if (this.storage.size() > 1) {
+            throw new InputMismatchException("This piece of furniture has more than one possible container to look through. Please enter a name to select a container");
+        }
+
+        if (this.storage.isEmpty()) {
+            throw new InputMismatchException("This piece of furniture has no space for items");
+        }
+
+        return this.storage.get(this.storage.keySet().iterator().next());
+    }
 
 	public HashMap<String, Container> getStorage() {
         return this.storage;
@@ -82,6 +97,10 @@ public class Furniture implements Hidden {
         return furnitureData;
     }
 
+    public HashSet<Item> getCheckedItems() {
+        return checkedItems;
+    }
+
     @Override
     public ArrayList<String> getUncoverIDs() {
         return this.uncoverIDs;
@@ -113,23 +132,34 @@ public class Furniture implements Hidden {
         return result;
     }
 
-    public void check() {
+    @Override
+    public boolean tryUncover(ArrayList<Uncover> uncovers) {
+        for (Uncover uncover : uncovers) {
+            if (tryUncover(uncover.getUncoverID())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void check(ArrayList<Uncover> uncovers) {
         if (this.storage.isEmpty()) {
             System.err.println("Nothing to see here");
             return;
         }
 
         String selectedStorage = "";
-        if (this.storage.keySet().size() > 1) {
+        if (this.storage.size() > 1) {
             System.out.printf("The %s has multiple parts that can be checked:\n", this.name);
             for (String storage : this.storage.keySet()) {
                 System.out.println(storage);
             }
 
-            selectedStorage = Game.getParser().promptInput("Which part would you like to check?");
+            selectedStorage = Zork2.getParser().promptInput("Which part would you like to check?");
             while (!storage.containsKey(selectedStorage)) {
                 System.out.printf("Option %s does not exist\n", selectedStorage);
-                selectedStorage = Game.getParser().promptInput("Which part would you like to check?");
+                selectedStorage = Zork2.getParser().promptInput("Which part would you like to check?");
             }
         }
         else {
@@ -137,33 +167,37 @@ public class Furniture implements Hidden {
         }
 
         Container container = this.storage.get(selectedStorage);
-        if (container.getContents().isEmpty()) {
+        container.check(uncovers);
+        if (container.getCheckedItems().isEmpty()) {
             System.out.println("There is nothing to be found");
             return;
         }
 
-        System.out.println("Found some items:");
+        this.checkedItems.addAll(container.getCheckedItems());
 
-        Player player = Game.getPlayer();
 
-        HashMap<Integer, Item> itemList = new HashMap<>();
-        int i = 0;
-        for (String itemName : container.getContents().keySet()) {
-            Item item = container.getContents().get(itemName);
-            if (!item.getIsUncovered()) {
-                for (Uncover uncover : player.getAllUncovers()) {
-                    if (item.tryUncover(uncover.getUncoverID())) {
-                        break;
-                    }
-                }
-            }
+//        System.out.println("Found some items:");
 
-            if (item.getIsUncovered()) {
-                System.out.printf("%s: %s", i, itemName);
-                itemList.put(i++, item);
-            }
-        }
-
-        Game.getParser().setLoadedItemList(itemList);
+//        Player player = Game.getPlayer();
+//
+//        HashMap<Integer, Item> itemList = new HashMap<>();
+//        int i = 0;
+//        for (String itemName : container.getContents().keySet()) {
+//            Item item = container.getContents().get(itemName);
+//            if (!item.getIsUncovered()) {
+//                for (Uncover uncover : player.getAllUncovers()) {
+//                    if (item.tryUncover(uncover.getUncoverID())) {
+//                        break;
+//                    }
+//                }
+//            }
+//
+//            if (item.getIsUncovered()) {
+//                System.out.printf("%s: %s", i, itemName);
+//                itemList.put(i++, item);
+//            }
+//        }
+//
+//        Game.getParser().setLoadedItemList(itemList);
     }
 }

@@ -4,8 +4,6 @@ import ch.bbw.zork.Items.*;
 import ch.bbw.zork.Items.Crowbar;
 import ch.bbw.zork.Items.Item;
 import ch.bbw.zork.enums.*;
-import ch.bbw.zork.interfaces.Uncover;
-import ch.bbw.zork.interfaces.Unlock;
 
 import java.util.*;
 
@@ -53,6 +51,8 @@ public class House {
                     }
                 }
 
+                // TODO: No Doors, furniture or items get created
+
                 generateDoors();
 
                 if (Zork2.DEBUG) {
@@ -69,16 +69,8 @@ public class House {
             i++;
         }
 
-
         generateFurniture();
         generateItems();
-
-
-
-        if (Zork2.DEBUG) {
-            System.out.printf(getMap());
-        }
-        System.out.println("Done Generating");
     }
 
     private void generateSafe() {
@@ -466,7 +458,7 @@ public class House {
             for (int x = 0; x < MAP_WIDTH; x++) {
                 Room room = getRoom(x, y);
                 for (int l = 0; l < ROOM_HEIGHT; l++) {
-                    if (room == null) {
+                    if (room == null || !room.isDiscovered()) {
                         mapStringArray[(y * ROOM_HEIGHT) + l] += new String(new char[ROOM_WIDTH]).replace('\0', ' ');
                     }
                     else {
@@ -486,9 +478,13 @@ public class House {
 
         int leftmost = Integer.MAX_VALUE;
         for (String line : cleanMap) {
+            if (line.indexOf(WALL_CHAR) == -1) {
+                continue;
+            }
             leftmost = Math.min(leftmost, line.indexOf(WALL_CHAR));
         }
 
+        System.out.println(leftmost);
         for (int i = 0; i < cleanMap.size(); i++) {
             String line = cleanMap.get(i);
              cleanMap.set(i, line.substring(leftmost));

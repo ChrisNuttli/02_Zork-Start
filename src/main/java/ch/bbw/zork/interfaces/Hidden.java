@@ -11,6 +11,7 @@ public interface Hidden {
     public boolean getIsUncovered();
     public void setIsUncovered(boolean isUncovered);
     public boolean tryUncover(String uncoverID);
+    public boolean tryUncover(ArrayList<Uncover> uncovers);
     public String getName();
     public LocationNote generatLocationNote(FurnitureData hidingSpot);
 }

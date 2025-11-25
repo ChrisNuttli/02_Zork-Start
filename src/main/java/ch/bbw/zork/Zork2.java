@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Zork2 {
     public static boolean DEBUG = true;
-    public static Parser parser;
+    private static Parser parser = new Parser(System.in);
     public final static List<String> validCommands = Arrays.asList("help",
         "move",
         "scan",
@@ -21,13 +21,13 @@ public class Zork2 {
 
 	public static void main(String[] args) {
         System.out.println("Welcome to the Zork Game!");
-        parser = new Parser(System.in);
+//        parser = new Parser(System.in);
         boolean quit = false;
         while (!quit) {
             switch(parser.chooseOption("Choose an option: ", new String[]{ "New Game", "Exit" })) {
                 case 1:
                     System.out.println("You selected New Game!");
-                    Game game = new Game(parser);
+                    Game game = new Game();
                     game.gameStart();
                     break;
                 case 2:
@@ -37,6 +37,10 @@ public class Zork2 {
             }
         }
 	}
+
+    public static Parser getParser() {
+        return parser;
+    }
 }
 
 

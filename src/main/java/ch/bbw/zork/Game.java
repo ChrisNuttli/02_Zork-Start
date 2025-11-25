@@ -13,13 +13,13 @@ public class Game {
     private static Player player;
     private String seed;
     private static Random random;
-    private static Parser parser;
+    private Parser parser;
 
-    public Game(Parser parser) {
+    public Game() {
         Random rand = new Random();
         setSeed(rand.nextInt());
         Parser.clearScreen();
-        this.parser = parser;
+        this.parser = Zork2.getParser();
         player = new Player();
         this.parser.setPlayer(player);
 
@@ -29,8 +29,7 @@ public class Game {
 
         house.generateHouse();
         Room frontYard = house.getRoom(RoomData.FRONT_YARD);
-        player.setX(frontYard.getX());
-        player.setY(frontYard.getY());
+        player.spawn(frontYard);
 
         gameStart();
     }
@@ -51,10 +50,11 @@ public class Game {
 
     private void update() {
         try {
-            Zork2.parser.waitForInput();
+            String[] input = parser.getCommandInputs();
+            parser.processCommand(input);
         }
-        catch(InputMismatchException e) {
-            System.out.println("Invalid command.");
+        catch(Exception e) {
+            System.out.println(e.getMessage());
         }
 
         if (remainingTime <= 0) {
@@ -91,7 +91,7 @@ public class Game {
         return house;
     }
 
-    public static Parser getParser() {
+    public Parser getParser() {
         return parser;
     }
 }

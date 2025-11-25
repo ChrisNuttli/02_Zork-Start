@@ -3,6 +3,7 @@ package ch.bbw.zork.Items;
 import ch.bbw.zork.Game;
 import ch.bbw.zork.enums.FurnitureData;
 import ch.bbw.zork.interfaces.Hidden;
+import ch.bbw.zork.interfaces.Uncover;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -57,6 +58,17 @@ public class Item implements Hidden {
             this.uncovered = true;
         }
         return result;
+    }
+
+    @Override
+    public boolean tryUncover(ArrayList<Uncover> uncovers) {
+        for (Uncover uncover : uncovers) {
+            if (tryUncover(uncover.getUncoverID())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
