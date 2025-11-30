@@ -5,8 +5,178 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import static ch.bbw.zork.enums.Direction.*;
+import static ch.bbw.zork.enums.FurnitureData.*;
 
 public enum RoomData {
+//    ATTIC(
+//            "Attic",
+//            "",
+//            new Direction[]{ SOUTH },
+//            new String[][] {
+//                    new String[]{
+//                            "Corridor",
+//                            "Living Room"
+//                    }
+//            }
+//    ),
+//    BASEMENT(
+//            "Basement",
+//            "",
+//            new Direction[]{ EAST },
+//            new String[][] {
+//                    new String[]{
+//                            "Corridor",
+//                            "Kitchen"
+//                    }
+//            }
+//    ),
+//    BATHROOM(
+//            "Bathroom",
+//            "",
+//            new Direction[]{ WEST },
+//            new String[][] {
+//                    new String[]{
+//                            "Bedroom",
+//                            "Corridor",
+//                            "Living Room"
+//                    }
+//            }
+//    ),
+//    BEDROOM(
+//            "Bedroom",
+//            "",
+//            new Direction[]{ EAST, SOUTH },
+//            new String[][] {
+//                    new String[]{
+//                            "Office",
+//                            "Bathroom"
+//                    },
+//                    new String[]{
+//                            "Living Room",
+//                            "Corridor",
+//                    }
+//            }
+//    ),
+//    CELLAR(
+//            "Cellar",
+//            "",
+//            new Direction[]{ NORTH },
+//            new String[][] {
+//                    new String[]{
+//                            "Corridor",
+//                            "Kitchen"
+//                    }
+//            }
+//    ),
+//    CORRIDOR(
+//            "Corridor",
+//            "",
+//            new Direction[]{  NORTH, EAST, SOUTH, WEST },
+//            new String[][] {
+//                    new String[]{
+//                            "Office",
+//                            "Bedroom",
+//                            "Kitchen",
+//                            "Attic",
+//                    },
+//                    new String[]{
+//                            "Bathroom",
+//                            "Kitchen",
+//                            "Living Room"
+//                    },
+//                    new String[]{
+//                            "Cellar",
+//                            "Front Yard"
+//                    },
+//                    new String[]{
+//                            "Living Room",
+//                            "Basement",
+//                    },
+//            }
+//    ),
+//    DINING_ROOM(
+//            "Dining Room",
+//            "",
+//            new Direction[]{ EAST, WEST },
+//            new String[][] {
+//                    new String[]{
+//                            "Office",
+//                            "Living Room",
+//                    },
+//                    new String[]{
+//                            "Kitchen",
+//                            "Corridor"
+//                    },
+//            }
+//    ),
+//    FRONT_YARD(
+//            "Front Yard",
+//            "",
+//            new Direction[]{ NORTH },
+//            new String[][] {
+//                    new String[]{
+//                            "Kitchen",
+//                            "Corridor",
+//                    }
+//            }
+//    ),
+//    KITCHEN(
+//            "Kitchen",
+//            "",
+//            new Direction[]{ EAST, SOUTH, WEST },
+//            new String[][] {
+//                    new String[]{
+//                            "Living Room",
+//                            "Dining Room",
+//                    },
+//                    new String[]{
+//                            "Front Yard",
+//                            "Cellar",
+//                            "Corridor"
+//                    },
+//                    new String[]{
+//                            "Corridor",
+//                            "Basement",
+//                    },
+//            }
+//    ),
+//    LIVING_ROOM(
+//            "Living Room",
+//            "",
+//            new Direction[]{ NORTH, EAST, WEST },
+//            new String[][] {
+//                    new String[]{
+//                            "Attic",
+//                            "Office",
+//                            "Bedroom",
+//                    },
+//                    new String[]{
+//                            "Bathroom",
+//                            "Corridor",
+//                    },
+//                    new String[]{
+//                            "Kitchen",
+//                            "Dining Room",
+//                            "Corridor"
+//                    },
+//            }
+//    ),
+//    OFFICE(
+//            "Office",
+//            "",
+//            new Direction[]{ SOUTH, WEST },
+//            new String[][] {
+//                    new String[]{
+//                            "Living Room",
+//                            "Corridor",
+//                    },
+//                    new String[]{
+//                            "Dining Room",
+//                            "Bedroom",
+//                    },
+//            }
+//    );
+
     ATTIC(
             "Attic",
             "",
@@ -16,7 +186,8 @@ public enum RoomData {
                             "Corridor",
                             "Living Room"
                     }
-            }
+            },
+            new FurnitureData[]{ BOX, BARREL, LADDER, SHELF }
     ),
     BASEMENT(
             "Basement",
@@ -27,7 +198,8 @@ public enum RoomData {
                             "Corridor",
                             "Kitchen"
                     }
-            }
+            },
+            new FurnitureData[]{ WASHING_MACHINE, DRYER, TOOLBOX, FREEZER }
     ),
     BATHROOM(
             "Bathroom",
@@ -39,7 +211,8 @@ public enum RoomData {
                             "Corridor",
                             "Living Room"
                     }
-            }
+            },
+            new FurnitureData[]{ TOILET, BATHTUB, SINK, SHOWER, MIRROR }
     ),
     BEDROOM(
             "Bedroom",
@@ -52,9 +225,10 @@ public enum RoomData {
                     },
                     new String[]{
                             "Living Room",
-                            "Corridor",
+                            "Corridor"
                     }
-            }
+            },
+            new FurnitureData[]{ BED, WARDROBE, NIGHTSTAND, LAMP }
     ),
     CELLAR(
             "Cellar",
@@ -65,18 +239,19 @@ public enum RoomData {
                             "Corridor",
                             "Kitchen"
                     }
-            }
+            },
+            new FurnitureData[]{ WINE_RACK, CABINET, SIDEBOARD }
     ),
     CORRIDOR(
             "Corridor",
             "",
-            new Direction[]{  NORTH, EAST, SOUTH, WEST },
+            new Direction[]{ NORTH, EAST, SOUTH, WEST },
             new String[][] {
                     new String[]{
                             "Office",
                             "Bedroom",
                             "Kitchen",
-                            "Attic",
+                            "Attic"
                     },
                     new String[]{
                             "Bathroom",
@@ -89,9 +264,10 @@ public enum RoomData {
                     },
                     new String[]{
                             "Living Room",
-                            "Basement",
-                    },
-            }
+                            "Basement"
+                    }
+            },
+            new FurnitureData[]{ COAT_RACK, SHOE_RACK, BENCH }
     ),
     DINING_ROOM(
             "Dining Room",
@@ -100,13 +276,14 @@ public enum RoomData {
             new String[][] {
                     new String[]{
                             "Office",
-                            "Living Room",
+                            "Living Room"
                     },
                     new String[]{
                             "Kitchen",
                             "Corridor"
-                    },
-            }
+                    }
+            },
+            new FurnitureData[]{ TABLE, CHAIR, COFFEE_TABLE }
     ),
     FRONT_YARD(
             "Front Yard",
@@ -115,9 +292,10 @@ public enum RoomData {
             new String[][] {
                     new String[]{
                             "Kitchen",
-                            "Corridor",
+                            "Corridor"
                     }
-            }
+            },
+            new FurnitureData[]{ GARDEN_TABLE, GARDEN_CHAIR, FLOWER_POT, GRILL }
     ),
     KITCHEN(
             "Kitchen",
@@ -126,7 +304,7 @@ public enum RoomData {
             new String[][] {
                     new String[]{
                             "Living Room",
-                            "Dining Room",
+                            "Dining Room"
                     },
                     new String[]{
                             "Front Yard",
@@ -135,9 +313,10 @@ public enum RoomData {
                     },
                     new String[]{
                             "Corridor",
-                            "Basement",
-                    },
-            }
+                            "Basement"
+                    }
+            },
+            new FurnitureData[]{ FRIDGE, STOVE, CABINET }
     ),
     LIVING_ROOM(
             "Living Room",
@@ -147,18 +326,19 @@ public enum RoomData {
                     new String[]{
                             "Attic",
                             "Office",
-                            "Bedroom",
+                            "Bedroom"
                     },
                     new String[]{
                             "Bathroom",
-                            "Corridor",
+                            "Corridor"
                     },
                     new String[]{
                             "Kitchen",
                             "Dining Room",
                             "Corridor"
-                    },
-            }
+                    }
+            },
+            new FurnitureData[]{ SOFA, TV_STAND, COFFEE_TABLE }
     ),
     OFFICE(
             "Office",
@@ -167,13 +347,14 @@ public enum RoomData {
             new String[][] {
                     new String[]{
                             "Living Room",
-                            "Corridor",
+                            "Corridor"
                     },
                     new String[]{
                             "Dining Room",
-                            "Bedroom",
-                    },
-            }
+                            "Bedroom"
+                    }
+            },
+            new FurnitureData[]{ DESK, CHAIR, BOOKCASE, FILING_CABINET, COMPUTER }
     );
 
     private final String name;
@@ -181,11 +362,13 @@ public enum RoomData {
     private final Direction[] doorFrames;
     private final RoomShape shape;
     private final HashMap<Direction, ArrayList<String>> validNeighbors;
+    private final FurnitureData[] furnitureData;
 
-    private RoomData(String name, String description, Direction[] doorFrames, String[][] validNeighborNames) {
+    private RoomData(String name, String description, Direction[] doorFrames, String[][] validNeighborNames, FurnitureData[] furnitureData) {
         this.name = name;
         this.description = description;
         this.doorFrames = doorFrames;
+        this.furnitureData = furnitureData;
 //        this.validNeighborNames = validNeighborNames;
 
         this.validNeighbors = new HashMap<>();
@@ -279,5 +462,9 @@ public enum RoomData {
         }
 
         return validNeighborData;
+    }
+
+    public ArrayList<FurnitureData> getFurnitureData() {
+        return new ArrayList<>(Arrays.asList(furnitureData));
     }
 }

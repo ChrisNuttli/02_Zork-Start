@@ -9,7 +9,7 @@ import ch.bbw.zork.interfaces.Uncover;
 
 import java.util.*;
 
-public class Furniture implements Hidden {
+public class Furniture {
     private final String furnitureID;
 	private final String name;
 	private final String description;
@@ -33,16 +33,13 @@ public class Furniture implements Hidden {
         }
         this.uncoverIDs = new ArrayList<>();
         this.checkedItems = new HashSet<>();
+
+        Game.getHouse().addFurniture(this);
     }
 
 	public String getName() {
 		return name;
 	}
-
-    @Override
-    public LocationNote generatLocationNote(FurnitureData hidingSpot) {
-        return new LocationNote("", LocationNote.getRandomText(hidingSpot, this));
-    }
 
     public String getDescription() {
 		return description;
@@ -99,48 +96,6 @@ public class Furniture implements Hidden {
 
     public HashSet<Item> getCheckedItems() {
         return checkedItems;
-    }
-
-    @Override
-    public ArrayList<String> getUncoverIDs() {
-        return this.uncoverIDs;
-    }
-
-    @Override
-    public void addUncoverID(String uncoverID) {
-        this.uncoverIDs.add(uncoverID);
-        this.uncovered = true;
-    }
-
-    @Override
-    public boolean getIsUncovered() {
-        return this.uncovered;
-    }
-
-    @Override
-    public void setIsUncovered(boolean isUncovered) {
-        this.uncovered = isUncovered;
-    }
-
-    @Override
-    public boolean tryUncover(String uncoverID) {
-        if (this.uncovered) { return true; }
-        boolean result = this.uncoverIDs.contains(uncoverID);
-        if (result) {
-            this.uncovered = true;
-        }
-        return result;
-    }
-
-    @Override
-    public boolean tryUncover(ArrayList<Uncover> uncovers) {
-        for (Uncover uncover : uncovers) {
-            if (tryUncover(uncover.getUncoverID())) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public void check(ArrayList<Uncover> uncovers) {

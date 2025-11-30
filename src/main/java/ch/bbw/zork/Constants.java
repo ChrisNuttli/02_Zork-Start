@@ -20,6 +20,9 @@ public final class Constants {
 
     public static final int MAX_CORRIDORS = 10;
 
+    public static final int TIME_NOTE_COUNT = 5;
+    public static final int HIDDEN_FURNITURE_COUNT = 3;
+
     public static final int STARTING_TIME = 300;
     public static final int MOVE_TIME = 5;
     public static final int SCAN_TIME = 10;

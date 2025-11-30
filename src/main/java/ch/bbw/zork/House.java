@@ -1,9 +1,8 @@
 package ch.bbw.zork;
 
 import ch.bbw.zork.Items.*;
-import ch.bbw.zork.Items.Crowbar;
-import ch.bbw.zork.Items.Item;
 import ch.bbw.zork.enums.*;
+import ch.bbw.zork.interfaces.Unlock;
 
 import java.util.*;
 
@@ -11,10 +10,16 @@ import static ch.bbw.zork.Constants.*;
 
 public class House {
     private HashSet<Room> roomList;
-    private final int maxIterations = 10000;
+    private HashSet<Door> doorList;
+    private HashSet<Furniture> furnitureList;
+    private HashSet<Item> itemList;
+    private final int maxIterations = Integer.MAX_VALUE;
 
     public House() {
         roomList = new HashSet<>();
+        doorList = new HashSet<>();
+        furnitureList = new HashSet<>();
+        itemList = new HashSet<>();
     }
 
     public void generateHouse() {
@@ -37,58 +42,53 @@ public class House {
             }
         }
 
-        // TODO: Generate Doors
-        // TODO: Generate Furniture
+        generateDoors();
+        generateFurniture();
+
         // TODO: Generate Items
+        generateItems();
+        placeItems();
+
+        // TODO: Generate Safe
+
+        System.out.println("Done!");
     }
 
-    private void generateSafe() {
-        int maxDepthScore = 0;
-        for (Room room : roomList) {
-            maxDepthScore = Math.max(maxDepthScore, room.getDepthScore());
-        }
+    private void placeItems() {
+        for (Item item : itemList) {
+            if (item instanceof Unlock) {
+                int depth = doorList.stream().filter(door ->
+                        door.getLock() != null &&
+                        door.getLock().getKey() == item
+                ).findFirst().map(door ->
+                        Game.getRandom().nextInt(door.getDepthScore() - 1)).orElse(0);
 
-        ArrayList<Room> safeRooms = new ArrayList<>(roomList);
-        int roomIndex = 0;
+                HashSet<Room> hideRoomCandidates = new HashSet<>(roomList);
+                hideRoomCandidates.removeIf((room) -> room.getDepthScore() > depth);
 
-        while (!safeRooms.isEmpty()) {
-            try {
-                roomIndex = new Random().nextInt(safeRooms.size());
-                if (safeRooms.get(roomIndex).getDepthScore() < Math.floorDiv(maxDepthScore, 2)) {
-                    throw new RuntimeException("Room is not deep enough");
-                }
-
-                Room safeRoom = safeRooms.get(roomIndex);
-                ArrayList<Furniture> furnitureList = safeRoom.getFurnitureList();
-                int furnitureIndex = 0;
-                FurnitureData fd = null;
-                while (fd.getHidingSpot().isEmpty() && !furnitureList.isEmpty()) {
-                    if (fd != null) {
-                        furnitureList.remove(furnitureList.get(furnitureIndex));
+                int randomIndex = Game.getRandom().nextInt(hideRoomCandidates.size());
+                int i = 0;
+                for (Room room : hideRoomCandidates) {
+                    if (i == randomIndex) {
+                        room.hideItem(item);
+                        break;
                     }
-                    furnitureIndex = new Random().nextInt(furnitureList.size());
-                    fd = furnitureList.get(furnitureIndex).getFurnitureData();
+                    i++;
                 }
-
-                if (furnitureList.isEmpty()) {
-                    throw new RuntimeException("No valid furniture found in room!");
-                }
-
-                Furniture safe = new Furniture(FurnitureData.SAFE);
-                Lock keyLock = new Lock(LockType.KEY_HOLE);
-                Lock codeLock = new Lock(LockType.NUMPAD);
-
-                LocationNote locationNote = safe.generatLocationNote(fd);
-                Key safeKey = keyLock.getKey();
-                String safeCode = codeLock.getCode();
-                Note safeCodeNote = new Note("Note", String.format("safe: %s", safeCode));
-
-                hideItem(safeKey);
-                hideItem(safeCodeNote);
-                hideItem(locationNote);
             }
-            catch(Exception e) {
-                safeRooms.remove(roomIndex);
+            else {
+                HashSet<Room> hideRoomCandidates = new HashSet<>(roomList);
+                hideRoomCandidates.removeIf((room) -> room.getDepthScore() == 0);
+
+                int randomIndex = Game.getRandom().nextInt(hideRoomCandidates.size());
+                int i = 0;
+                for (Room room : hideRoomCandidates) {
+                    if (i == randomIndex) {
+                        room.hideItem();
+                        break;
+                    }
+                    i++;
+                }
             }
         }
     }
@@ -143,80 +143,90 @@ public class House {
                 }
             }
         }
+
+        // calculate the depth scores of all rooms
+        boolean done = false;
+        while (!done) {
+            done = true;
+            for (Room room : roomList) {
+                int initialScore = room.getDepthScore();
+                room.calculateDepthScore();
+                if (initialScore != room.getDepthScore()) {
+                    done = false;
+                }
+            }
+        }
     }
 
     private void generateDoors() {
         for (Room room : roomList) {
-            try {
-                for (Direction dir : room.getDoorFrames()) {
-                    if (room.getDoor(dir) != null) {
-                        continue;
-                    }
-
-                    if ((dir == Direction.NORTH && room.getY() == 0) ||
-                        (dir == Direction.SOUTH && room.getY() == MAP_HEIGHT - 1) ||
-                        (dir == Direction.EAST && room.getX() == MAP_WIDTH - 1) ||
-                        (dir == Direction.WEST && room.getX() == 0)) {
-                        throw new RuntimeException("Cannot create room outside of map");
-                    }
-
-                    Room neighbor = getRoom(getNeighborCoordinates(room.getX(), room.getY(), dir));
-                    Door door = new Door(dir, neighbor, dir.getOpposite(), room);
-                    room.addDoor(dir, door);
-                    neighbor.addDoor(dir.getOpposite(), door);
+            for (Direction dir : room.getDoorFrames()) {
+                if (room.getDoor(dir) != null) {
+                    continue;
                 }
-            }
-            catch(Exception e) {
-//                System.err.println("Error while adding a door to " + room.getName());
-//                for (Direction dir : room.getDoorFrames()) {
-//                    System.err.print(dir + ": " + getRoom(getNeighborCoordinates(room.getX(), room.getY(), dir)));
-//                }
-                if (e instanceof RuntimeException) {
-                    throw new RuntimeException(e.getMessage());
-                }
+
+                Room neighbor = getRoom(getNeighborCoordinates(room.getX(), room.getY(), dir));
+                Door door = new Door(dir.getOpposite(), room, dir, neighbor);
+                doorList.add(door);
             }
         }
     }
 
     private void generateFurniture() {
         for (Room room : roomList) {
-            RoomData roomData = room.getRoomData();
-            ArrayList<FurnitureData> furnitureDataList = getFurnitureDataForRoom(roomData);
-            int min = furnitureDataList.size() / 2;
-            int furnitureCount = Game.getRandom().nextInt((furnitureDataList.size()+1) - min) + min;
-            while (room.getFurnitureList().size() < furnitureCount) {
-                int randomIndex = Game.getRandom().nextInt(furnitureDataList.size());
-                FurnitureData furnitureData = furnitureDataList.get(randomIndex);
-                if (room.getFurnitureCount(furnitureData) < furnitureData.getMax(roomData)) {
-                    room.addFurniture(furnitureData);
-                }
+            ArrayList<FurnitureData> furnitureDataList = room.getRoomData().getFurnitureData();
+            for (FurnitureData furnitureData : furnitureDataList) {
+                if (furnitureData == FurnitureData.SAFE) {continue;}
+                Furniture furniture = new Furniture(furnitureData);
+                room.addFurniture(furniture);
             }
         }
     }
 
     private void generateItems() {
-        ArrayList<Item> itemList = new ArrayList<>();
-        for (ItemData itemData : ITEM_DATA_LIST) {
-            if (itemData == ItemData.KEY || itemData == ItemData.LOCATION_NOTE) {continue;}
-            if (itemData.getSpawnProbability() >= Game.getRandom().nextInt(100)) {
-                int min = Math.max(1, itemData.getMinSpawns());
-                int spawnCount = Game.getRandom().nextInt(itemData.getMaxSpawns()+1 - min) + min;
-                for (int i = 0; i < spawnCount; i++) {
-                    switch (itemData) {
-                        case BACKPACK:
-                            itemList.add(new Backpack());
-                            break;
-                        case FLASHLIGHT:
-                            itemList.add(new Flashlight());
-                            break;
-                        case CROWBAR:
-                            itemList.add(new Crowbar());
-                            break;
-                        case TIME_NOTE:
-                            itemList.add(new TimeNote());
-                    }
+        generateDoorLocks();
+
+        // Generate the rest of the items
+        for (ItemData id : ITEM_DATA_LIST) {
+            if (id.getSpawnProbability() < Game.getRandom().nextDouble()) {
+                continue;
+            }
+
+            int spawnCount = Game.getRandom().nextInt(id.getMaxSpawns() -  id.getMinSpawns()) +  id.getMinSpawns();
+            for (int i = 0; i < spawnCount; i++) {
+                switch(id) {
+                    case BACKPACK:
+                        new Backpack();
+                        break;
+                    case TIME_NOTE:
+                        new TimeNote();
+                        break;
+                    default:
+                        break;
                 }
             }
+        }
+    }
+
+    private void generateDoorLocks() {
+        int randomIndexA = Game.getRandom().nextInt(doorList.size());
+        int randomIndexB = Game.getRandom().nextInt(doorList.size());
+        int randomIndexC = Game.getRandom().nextInt(doorList.size());
+
+        while (randomIndexA == randomIndexB || randomIndexC == randomIndexA || randomIndexC == randomIndexB) {
+            randomIndexA = Game.getRandom().nextInt(doorList.size());
+            randomIndexB = Game.getRandom().nextInt(doorList.size());
+            randomIndexC = Game.getRandom().nextInt(doorList.size());
+        }
+
+        int i = 0;
+        for (Door door : doorList) {
+            if (i == randomIndexA || i == randomIndexB || i == randomIndexC) {
+                Lock lock = new Lock(LockType.KEY_HOLE);
+                door.setLock(lock);
+            }
+
+            i++;
         }
     }
 
@@ -395,6 +405,14 @@ public class House {
         roomList.add(room);
     }
 
+    public void addFurniture(Furniture furniture) {
+        this.furnitureList.add(furniture);
+    }
+
+    public void addItem(Item item) {
+        this.itemList.add(item);
+    }
+
     public int[] getNeighborCoordinates(int x, int y, Direction direction) {
         return getNeighborCoordinates(new int[]{x, y}, direction);
     }
@@ -532,10 +550,6 @@ public class House {
         return String.join("\n", mapStringArray);
     }
 
-    public HashSet<Room> getRoomList() {
-        return roomList;
-    }
-
     public ArrayList<RoomData> getUsedRoomData() {
         HashSet<RoomData> roomDataList = new HashSet<>();
         int corridorCount = 0;
@@ -554,12 +568,6 @@ public class House {
         return new ArrayList<>(roomDataList);
     }
 
-    public ArrayList<RoomData> getMissingRoomData() {
-        ArrayList<RoomData> roomDataList = new ArrayList<>(Arrays.asList(ROOM_DATA_LIST));
-        roomDataList.removeAll(this.getUsedRoomData());
-        return roomDataList;
-    }
-
     public int countRoom(RoomData roomData) {
         int count = 0;
         for (Room room : roomList) {
@@ -569,5 +577,14 @@ public class House {
         }
 
         return count;
+    }
+
+    private int getMaxDepth() {
+        int maxDepth = 0;
+        for (Room room : roomList) {
+            maxDepth = Math.max(maxDepth, room.getDepthScore());
+        }
+
+        return maxDepth;
     }
 }

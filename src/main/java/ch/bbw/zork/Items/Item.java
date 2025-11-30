@@ -2,6 +2,7 @@ package ch.bbw.zork.Items;
 
 import ch.bbw.zork.Game;
 import ch.bbw.zork.enums.FurnitureData;
+import ch.bbw.zork.enums.ItemData;
 import ch.bbw.zork.interfaces.Hidden;
 import ch.bbw.zork.interfaces.Uncover;
 
@@ -16,6 +17,7 @@ public class Item implements Hidden {
     private final double weight;
     private boolean uncovered = true;
     private ArrayList<String> uncoverIDs;
+    private ItemData itemData;
 
     protected Item(String name, String description) {
         this(name, description, 0, 0);
@@ -27,6 +29,8 @@ public class Item implements Hidden {
         this.space = space;
         this.weight = weight;
         this.itemID = UUID.randomUUID().toString();
+
+        Game.getHouse().addItem(this);
 	}
 
     @Override
@@ -95,5 +99,13 @@ public class Item implements Hidden {
 
     public String getItemID() {
         return itemID;
+    }
+
+    public ItemData getItemData() {
+        return itemData;
+    }
+
+    public void setItemData(ItemData itemData) {
+        this.itemData = itemData;
     }
 }

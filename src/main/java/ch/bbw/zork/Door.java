@@ -16,59 +16,10 @@ public class Door {
 		this.rooms = new HashMap<>();
 		this.rooms.put(dirA, roomA);
 		this.rooms.put(dirB, roomB);
+
+        roomA.addDoor(dirA.getOpposite(), this);
+        roomB.addDoor(dirB.getOpposite(), this);
 	}
-
-    public Door(Direction dirA, Room roomA, RoomData roomDataB) {
-        this.rooms = new HashMap<>();
-        Direction dirB = dirA.getOpposite();
-        this.rooms.put(dirB, roomA);
-        int[] coordinatesB = Game.getHouse().getNeighborCoordinates(roomA.getX(), roomA.getY(), dirA);
-        this.rooms.put(dirA, new Room(coordinatesB[0], coordinatesB[1], roomDataB));
-    }
-
-    public Door(Direction dirA, Room roomA) {
-        this.rooms = new HashMap<>();
-        this.rooms.put(dirA.getOpposite(), roomA);
-//        roomA.addDoor(dirA, this);
-
-//        ArrayList<RoomData> validNeighborsA = roomA.getValidNeighbors(dirA.getOpposite());
-//        ArrayList<RoomData> usableNeighborsA = roomA.getUsableNeighbors(dirA.getOpposite());
-//        Room roomB = Game.getHouse().getRoom(coords[0], coords[1]);
-//
-//        if (roomB != null && !validNeighborsA.contains(roomB.getRoomData())) {
-//            throw new IllegalStateException("Cannot generate room of type");
-//        }
-//
-//        if (roomB == null) {
-//            if (usableNeighborsA.contains(RoomData.CORRIDOR) && usableNeighborsA.size() > 1) {
-//                usableNeighborsA.remove(RoomData.CORRIDOR);
-//            }
-//            int roomDataIndex = 0;
-//
-//            if (usableNeighborsA.size() > 1) {
-//                roomDataIndex = Game.getRandom().nextInt(usableNeighborsA.size());
-//            }
-//            else if (usableNeighborsA.isEmpty()) {
-//                throw new IllegalStateException("No more valid rooms for neighbor of type " + roomA.getName());
-//            }
-//
-//            RoomData roomDataB = usableNeighborsA.get(roomDataIndex);
-//
-//            roomB = new Room(coords[0], coords[1], roomDataB);
-//        }
-//
-//        this.rooms.put(dirA.getOpposite(), roomB);
-//
-//        // Attach the door to both rooms
-//        if (this.rooms.size() != 2) {
-//            throw new IllegalStateException("Door does not have 2 rooms to attach itself to");
-//        }
-//
-//        for (Direction dir : this.rooms.keySet()) {
-//            Room room = this.rooms.get(dir);
-//            room.addDoor(dir, this);
-//        }
-    }
 
     public Room generateNeighbor() {
         if (this.rooms.size() == 2) {
@@ -169,5 +120,14 @@ public class Door {
         }
 
         return this.rooms.get(direction);
+    }
+
+    public int getDepthScore() {
+        int score = 0;
+        for (Room room : this.rooms.values()) {
+            score = Math.max(score, room.getDepthScore());
+        }
+
+        return score;
     }
 }
