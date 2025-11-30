@@ -31,6 +31,10 @@ public class Game {
         Room frontYard = house.getRoom(RoomData.FRONT_YARD);
         player.spawn(frontYard);
 
+        if (Zork2.DEBUG) {
+            System.out.println(house.getMap());
+        }
+
         gameStart();
     }
 

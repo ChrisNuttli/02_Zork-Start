@@ -10,67 +10,36 @@ import java.util.*;
 import static ch.bbw.zork.Constants.*;
 
 public class House {
-    private ArrayList<Room> roomList;
+    private HashSet<Room> roomList;
+    private final int maxIterations = 10000;
 
     public House() {
-        roomList = new ArrayList<>();
+        roomList = new HashSet<>();
     }
 
     public void generateHouse() {
         System.out.println("Please wait. Generating a new map...");
 
-        int i = 1;
-        while (true) {
+        for (int i = 0; i < maxIterations; i++) {
             try {
                 generateRooms();
-                if (roomList.size() < ROOM_DATA_LIST.length) {
-                    throw new RuntimeException("Not all room types were used in the generation");
-                }
-
-                for (Room room : roomList) {
-                    if (room.getRoomData() == RoomData.CORRIDOR) {
-                        Room northRoom = getRoom(getNeighborCoordinates(room.getX(), room.getY(), Direction.NORTH));
-                        Room eastRoom = getRoom(getNeighborCoordinates(room.getX(), room.getY(), Direction.EAST));
-                        Room southRoom = getRoom(getNeighborCoordinates(room.getX(), room.getY(), Direction.SOUTH));
-                        Room westRoom = getRoom(getNeighborCoordinates(room.getX(), room.getY(), Direction.WEST));
-                        if (northRoom == null || !northRoom.getDoorFrames().contains(Direction.SOUTH)) {
-                            room.removeDoorFrame(Direction.NORTH);
-                        }
-
-                        if (eastRoom == null || !eastRoom.getDoorFrames().contains(Direction.WEST)) {
-                            room.removeDoorFrame(Direction.EAST);
-                        }
-
-                        if (southRoom == null || !southRoom.getDoorFrames().contains(Direction.NORTH)) {
-                            room.removeDoorFrame(Direction.SOUTH);
-                        }
-
-                        if (westRoom == null || !westRoom.getDoorFrames().contains(Direction.EAST)) {
-                            room.removeDoorFrame(Direction.WEST);
-                        }
-                    }
-                }
-
-                // TODO: No Doors, furniture or items get created
-
-                generateDoors();
 
                 if (Zork2.DEBUG) {
-                    System.out.printf("Successful generation in attempt nr. %s.\n", i);
+                    System.out.println("Room Count: " + roomList.size());
                 }
                 break;
             }
-            catch(Exception e) {
-//                if (Zork2.DEBUG) {
-//                    System.out.printf(getMap());
-//                    System.out.println(i + " " + e.getMessage());
-//                }
+            catch (Exception e) {
+                if (i == maxIterations-1) {
+                    System.err.println(e.getMessage());
+                    throw e;
+                }
             }
-            i++;
         }
 
-        generateFurniture();
-        generateItems();
+        // TODO: Generate Doors
+        // TODO: Generate Furniture
+        // TODO: Generate Items
     }
 
     private void generateSafe() {
@@ -126,36 +95,53 @@ public class House {
 
     private void generateRooms() {
         roomList.clear();
-        Room frontYard = new Room((int)Math.ceil((double)MAP_WIDTH / 2), MAP_HEIGHT-1, RoomData.FRONT_YARD, this);
-        roomList.add(frontYard);
+        new Room((int)Math.ceil((double)MAP_WIDTH / 2), MAP_HEIGHT-1, RoomData.FRONT_YARD);
+        HashSet<Room> rooms = new HashSet<>();
 
-        ArrayList<Room> rooms;
-        boolean done = false;
-
-        while(!done) {
-            if (roomList.size() > ROOM_DATA_LIST.length * 2) {
-                throw new RuntimeException("Too many rooms in this house");
-            }
-
-            rooms = new ArrayList<>(roomList);
+        do {
+            rooms.addAll(roomList);
             for (Room room : rooms) {
-                ArrayList<Direction> missing = room.getMissingNeighborDirections();
-                if (missing.isEmpty()) {
-                    continue;
-                }
-                for (Direction direction : missing) {
-                    RoomData neighborData = room.decideNeighbor(direction);
-                    if (neighborData != null) {
-                        int[] coordinates = getNeighborCoordinates(room.getX(), room.getY(), direction);
-                        roomList.add(new Room(coordinates[0], coordinates[1], neighborData, this));
-                    }
-                    else {
-                        throw new RuntimeException("No suitable candidate was found");
+                room.generateNeighbors();
+            }
+        } while (rooms.size() != roomList.size());
+
+        HashMap<RoomData, Integer> roomCount = new HashMap<>();
+
+        for (Room room : roomList) {
+            RoomData rd = room.getRoomData();
+            if (!roomCount.containsKey(rd)) {
+                roomCount.put(rd, 0);
+            }
+
+            roomCount.put(rd, roomCount.get(rd) + 1);
+        }
+
+        if (roomCount.size() < ROOM_DATA_LIST.length) {
+            throw new IllegalStateException("Not all Rooms got generated!");
+        }
+
+        for (RoomData rd : ROOM_DATA_LIST) {
+            if (rd == RoomData.CORRIDOR) {continue;}
+            if (!roomCount.containsKey(rd)) {
+                throw new IllegalStateException("Not all Rooms got generated!");
+            }
+
+            int count = roomCount.get(rd);
+            if (count != 1) {
+                throw new IllegalStateException("Some Rooms were generated multiple times!");
+            }
+        }
+
+        // Remove invalid doorframes from corridors
+        for (Room room : roomList) {
+            if (room.getRoomData() == RoomData.CORRIDOR) {
+                for (Direction dir : room.getDoorFrames()) {
+                    Room neighbor = getRoom(getNeighborCoordinates(room.getX(), room.getY(), dir));
+                    if (neighbor == null || !neighbor.getDoorFrames().contains(dir.getOpposite())) {
+                        room.removeDoorFrame(dir);
                     }
                 }
             }
-
-            done = roomList.size() == rooms.size();
         }
     }
 
@@ -245,15 +231,14 @@ public class House {
         return furnitureData;
     }
 
-    public ArrayList<RoomData> getCandidatesForCoodinates(int[] coordinates) {
-        return getCandidatesForCoodinates(coordinates[0], coordinates[1]);
+    public ArrayList<RoomData> getCandidatesForCoordinates(int[] coordinates) {
+        return getCandidatesForCoordinates(coordinates[0], coordinates[1]);
     }
 
-    public ArrayList<RoomData> getCandidatesForCoodinates(int x, int y) {
+    public ArrayList<RoomData> getCandidatesForCoordinates(int x, int y) {
         if (getRoom(x,y) != null) return null;
 
         ArrayList<RoomData> candidates = new ArrayList<>(Arrays.asList(ROOM_DATA_LIST));
-        candidates.add(RoomData.CORRIDOR);
 
         Room northRoom = getRoom(x, y-1);
         Room eastRoom = getRoom(x+1, y);
@@ -262,6 +247,7 @@ public class House {
 
         if (northRoom != null) {
             if (!northRoom.getDoorFrames().contains(Direction.SOUTH)) {
+                // No door towards north is possible
                 for (RoomData rd : ROOM_DATA_LIST) {
                     if (!candidates.contains(rd)) {continue;}
                     if (Arrays.asList(rd.getDoorFrames()).contains(Direction.NORTH)) {
@@ -270,17 +256,30 @@ public class House {
                 }
             }
             else {
+                // A door towards north must be included
                 for (RoomData rd : ROOM_DATA_LIST) {
                     if (!candidates.contains(rd)) {continue;}
-                    if (!Arrays.asList(rd.getDoorFrames()).contains(Direction.NORTH)) {
+                    if (!Arrays.asList(rd.getDoorFrames()).contains(Direction.NORTH) ||
+                            (northRoom.getRoomData().getShape() == RoomShape.DEAD_END && rd.getShape() == RoomShape.DEAD_END)
+                    ) {
                         candidates.remove(rd);
                     }
+                }
+            }
+        }
+        else if (y == 0) {
+            // No door to the north is possible
+            for (RoomData rd : ROOM_DATA_LIST) {
+                if (!candidates.contains(rd)) {continue;}
+                if (Arrays.asList(rd.getDoorFrames()).contains(Direction.NORTH)) {
+                    candidates.remove(rd);
                 }
             }
         }
 
         if (eastRoom != null) {
             if (!eastRoom.getDoorFrames().contains(Direction.WEST)) {
+                // No door towards east is possible
                 for (RoomData rd : ROOM_DATA_LIST) {
                     if (!candidates.contains(rd)) {continue;}
                     if (Arrays.asList(rd.getDoorFrames()).contains(Direction.EAST)) {
@@ -289,17 +288,30 @@ public class House {
                 }
             }
             else {
+                // A door towards east must be included
                 for (RoomData rd : ROOM_DATA_LIST) {
                     if (!candidates.contains(rd)) {continue;}
-                    if (!Arrays.asList(rd.getDoorFrames()).contains(Direction.EAST)) {
+                    if (!Arrays.asList(rd.getDoorFrames()).contains(Direction.EAST) ||
+                            (eastRoom.getRoomData().getShape() == RoomShape.DEAD_END && rd.getShape() == RoomShape.DEAD_END)
+                    ) {
                         candidates.remove(rd);
                     }
+                }
+            }
+        }
+        else if (x == MAP_WIDTH - 1) {
+            // No door towards east is possible
+            for (RoomData rd : ROOM_DATA_LIST) {
+                if (!candidates.contains(rd)) {continue;}
+                if (Arrays.asList(rd.getDoorFrames()).contains(Direction.EAST)) {
+                    candidates.remove(rd);
                 }
             }
         }
 
         if (southRoom != null) {
             if (!southRoom.getDoorFrames().contains(Direction.NORTH)) {
+                // No door towards south is possible
                 for (RoomData rd : ROOM_DATA_LIST) {
                     if (!candidates.contains(rd)) {continue;}
                     if (Arrays.asList(rd.getDoorFrames()).contains(Direction.SOUTH)) {
@@ -308,17 +320,30 @@ public class House {
                 }
             }
             else {
+                // A door towards south must be included
                 for (RoomData rd : ROOM_DATA_LIST) {
                     if (!candidates.contains(rd)) {continue;}
-                    if (!Arrays.asList(rd.getDoorFrames()).contains(Direction.SOUTH)) {
+                    if (!Arrays.asList(rd.getDoorFrames()).contains(Direction.SOUTH) ||
+                            (southRoom.getRoomData().getShape() == RoomShape.DEAD_END && rd.getShape() == RoomShape.DEAD_END)
+                    ) {
                         candidates.remove(rd);
                     }
+                }
+            }
+        }
+        else if (y == MAP_HEIGHT - 1) {
+            // No door towards south is possible
+            for (RoomData rd : ROOM_DATA_LIST) {
+                if (!candidates.contains(rd)) {continue;}
+                if (Arrays.asList(rd.getDoorFrames()).contains(Direction.SOUTH)) {
+                    candidates.remove(rd);
                 }
             }
         }
 
         if (westRoom != null) {
             if (!westRoom.getDoorFrames().contains(Direction.EAST)) {
+                // No door towards west is possible
                 for (RoomData rd : ROOM_DATA_LIST) {
                     if (!candidates.contains(rd)) {continue;}
                     if (Arrays.asList(rd.getDoorFrames()).contains(Direction.WEST)) {
@@ -327,14 +352,29 @@ public class House {
                 }
             }
             else {
+                // A door towards west must be included
                 for (RoomData rd : ROOM_DATA_LIST) {
                     if (!candidates.contains(rd)) {continue;}
-                    if (!Arrays.asList(rd.getDoorFrames()).contains(Direction.WEST)) {
+                    if (!Arrays.asList(rd.getDoorFrames()).contains(Direction.WEST) ||
+                            (westRoom.getRoomData().getShape() == RoomShape.DEAD_END && rd.getShape() == RoomShape.DEAD_END)
+                    ) {
                         candidates.remove(rd);
                     }
                 }
             }
         }
+        else if (x == 0) {
+            // No door towards west is possible
+            for (RoomData rd : ROOM_DATA_LIST) {
+                if (!candidates.contains(rd)) {continue;}
+                if (Arrays.asList(rd.getDoorFrames()).contains(Direction.WEST)) {
+                    candidates.remove(rd);
+                }
+            }
+        }
+
+        candidates.removeAll(getUsedRoomData());
+//        candidates.add(RoomData.CORRIDOR);
 
         return candidates;
     }
@@ -351,10 +391,7 @@ public class House {
         return findRoomByCoordinates(x, y);
     }
 
-    private void addRoom(Room room) throws IllegalArgumentException {
-        if (getRoom(room.getX(), room.getY()) != null) {
-             throw new IllegalArgumentException("Room already exists!");
-        }
+    public void addRoom(Room room) {
         roomList.add(room);
     }
 
@@ -458,7 +495,7 @@ public class House {
             for (int x = 0; x < MAP_WIDTH; x++) {
                 Room room = getRoom(x, y);
                 for (int l = 0; l < ROOM_HEIGHT; l++) {
-                    if (room == null || !room.isDiscovered()) {
+                    if (room == null || (!room.isDiscovered() && !Zork2.DEBUG)) {
                         mapStringArray[(y * ROOM_HEIGHT) + l] += new String(new char[ROOM_WIDTH]).replace('\0', ' ');
                     }
                     else {
@@ -493,5 +530,44 @@ public class House {
         mapStringArray = cleanMap.toArray(new String[0]);
 
         return String.join("\n", mapStringArray);
+    }
+
+    public HashSet<Room> getRoomList() {
+        return roomList;
+    }
+
+    public ArrayList<RoomData> getUsedRoomData() {
+        HashSet<RoomData> roomDataList = new HashSet<>();
+        int corridorCount = 0;
+        for (Room room : roomList) {
+            RoomData roomData = room.getRoomData();
+            roomDataList.add(roomData);
+            if (roomData == RoomData.CORRIDOR) {
+                corridorCount++;
+            }
+        }
+
+        if (corridorCount < MAX_CORRIDORS) {
+            roomDataList.remove(RoomData.CORRIDOR);
+        }
+
+        return new ArrayList<>(roomDataList);
+    }
+
+    public ArrayList<RoomData> getMissingRoomData() {
+        ArrayList<RoomData> roomDataList = new ArrayList<>(Arrays.asList(ROOM_DATA_LIST));
+        roomDataList.removeAll(this.getUsedRoomData());
+        return roomDataList;
+    }
+
+    public int countRoom(RoomData roomData) {
+        int count = 0;
+        for (Room room : roomList) {
+            if (room.getRoomData() == roomData) {
+                count++;
+            }
+        }
+
+        return count;
     }
 }
