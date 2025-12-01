@@ -1,1 +1,113 @@
-package ch.bbw.zork;import java.util.ArrayList;import java.util.Arrays;import java.util.HashSet;import java.util.Stack;/** * Class Game - the main class of the "Zork" game. * * Author:  Michael Kolling, 1.1, March 2000 * refactoring: Rinaldo Lanza, September 2020 */public class Game {	private Parser parser;	private Room currentRoom;	private Room outside, lab, tavern, gblock, office;	public Game() {		parser = new Parser(System.in);		// create rooms		outside = new Room("outside G block on Peninsula campus");		lab = new Room("lab, a lecture theatre in A block");		tavern = new Room("the Seahorse Tavern (the campus pub)");		gblock = new Room("the G Block");		office = new Room("the computing admin office");		// initialise room exits		outside.setExits(null, lab, gblock, tavern);		lab.setExits(null, null, null, outside);		tavern.setExits(null, outside, null, null);		gblock.setExits(outside, office, null, null);		office.setExits(null, null, null, gblock);		currentRoom = outside; // start game outside	}	/**	 *  Main play routine.  Loops until end of play.	 */	public void play() {		printWelcome();		// Enter the main command loop.  Here we repeatedly read commands and		// execute them until the game is over.		boolean finished = false;		while (!finished) {			Command command = parser.getCommand();			finished = processCommand(command);		}		System.out.println("Thank you for playing.  Good bye.");	}	private void printWelcome() {		System.out.println();		System.out.println("Welcome to Zork!");		System.out.println("Zork is a simple adventure game.");		System.out.println("Type 'help' if you need help.");		System.out.println();		System.out.println(currentRoom.longDescription());	}	private boolean processCommand(Command command) {		if (command.isUnknown()) {			System.out.println("I don't know what you mean...");			return false;		}		String commandWord = command.getCommandWord();		if (commandWord.equals("help")) {			printHelp();		} else if (commandWord.equals("go")) {			goRoom(command);		} else if (commandWord.equals("quit")) {			if (command.hasSecondWord()) {				System.out.println("Quit what?");			} else {				return true; // signal that we want to quit			}		}		return false;	}	private void printHelp() {		System.out.println("You are lost. You are alone. You wander");		System.out.println("around at Monash Uni, Peninsula Campus.");		System.out.println();		System.out.println("Your command words are:");		System.out.println(parser.showCommands());	}	private void goRoom(Command command) {		if (!command.hasSecondWord()) {			System.out.println("Go where?");		} else {			String direction = command.getSecondWord();			// Try to leave current room.			Room nextRoom = currentRoom.nextRoom(direction);			if (nextRoom == null)				System.out.println("There is no door!");			else {				currentRoom = nextRoom;				System.out.println(currentRoom.longDescription());				if (currentRoom == office) {					System.out.println("The window is open, Brr...");				}			}		}	}}
+package ch.bbw.zork;
+
+import ch.bbw.zork.enums.GameState;
+import ch.bbw.zork.enums.RoomData;
+
+import java.util.InputMismatchException;
+import java.util.Random;
+
+public class Game {
+    private GameState gameState;
+    private static int remainingTime;
+    private static House house;
+    private static Player player;
+    private String seed;
+    private static Random random;
+    private Parser parser;
+
+    public Game() {
+        Random rand = new Random();
+        setSeed(rand.nextInt());
+        Parser.clearScreen();
+        this.parser = Zork2.getParser();
+        player = new Player();
+        this.parser.setPlayer(player);
+
+        house = new House();
+        remainingTime = 9999;
+        gameState = GameState.NONE;
+
+        for (int i = 0; i < Constants.MAX_GEN_ITERATIONS; i++) {
+            try {
+                house.generateHouse();
+                break;
+            }
+            catch (Exception e) {
+                if (i == Constants.MAX_GEN_ITERATIONS - 1) {
+                    throw e;
+                }
+            }
+        }
+
+        Room frontYard = house.getRoom(RoomData.FRONT_YARD);
+        player.spawn(frontYard);
+
+        if (Zork2.DEBUG) {
+            System.out.println(house.getMap());
+        }
+
+        gameStart();
+    }
+
+    public void gameStart() {
+        Parser.clearScreen();
+        System.out.println("You stand in the Front Yard of your Victims house.");
+        while (this.gameState == GameState.NONE) {
+            update();
+        }
+
+        if (this.gameState == GameState.WIN) {
+            System.out.println("You won!");
+        }
+        else {
+            System.out.println("Better luck next time!");
+        }
+    }
+
+    private void update() {
+        try {
+            String[] input = parser.getCommandInputs();
+            parser.processCommand(input);
+        }
+        catch(Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        if (remainingTime <= 0) {
+            gameState = GameState.LOSE;
+        }
+    }
+
+    public void setSeed(int randomInt) {
+        seed = Parser.padLeft(Integer.toBinaryString(randomInt), '0', 30);
+        if (seed.length() > 30) {
+            seed = seed.subSequence(seed.length()-31, seed.length()-1).toString();
+        }
+        int seedInt = Integer.parseInt(seed, 2);
+        random = new Random(seedInt);
+    }
+
+    public static int getRemainingTime() {
+        return remainingTime;
+    }
+
+    public static void addTime(int time) {
+        remainingTime += time;
+    }
+
+    public static Player getPlayer() {
+        return player;
+    }
+
+    public static Random getRandom() {
+        return random;
+    }
+
+    public static House getHouse() {
+        return house;
+    }
+
+    public Parser getParser() {
+        return parser;
+    }
+}
