@@ -27,7 +27,18 @@ public class Game {
         remainingTime = 9999;
         gameState = GameState.NONE;
 
-        house.generateHouse();
+        for (int i = 0; i < Constants.MAX_GEN_ITERATIONS; i++) {
+            try {
+                house.generateHouse();
+                break;
+            }
+            catch (Exception e) {
+                if (i == Constants.MAX_GEN_ITERATIONS - 1) {
+                    throw e;
+                }
+            }
+        }
+
         Room frontYard = house.getRoom(RoomData.FRONT_YARD);
         player.spawn(frontYard);
 
@@ -39,6 +50,7 @@ public class Game {
     }
 
     public void gameStart() {
+        Parser.clearScreen();
         System.out.println("You stand in the Front Yard of your Victims house.");
         while (this.gameState == GameState.NONE) {
             update();

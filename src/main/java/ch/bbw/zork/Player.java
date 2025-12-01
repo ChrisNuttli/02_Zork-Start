@@ -28,9 +28,9 @@ public class Player {
             this.name = Zork2.getParser().promptInput("Enter your name: ");
         }
 
-        this.memory = new Container(Integer.MAX_VALUE, 0, Integer.MAX_VALUE);
-        this.leftHand = new Container(Integer.MAX_VALUE, Double.MAX_VALUE, 1);
-        this.rightHand = new Container(Integer.MAX_VALUE, Double.MAX_VALUE, 1);
+        this.memory = new Container(Integer.MAX_VALUE, 0, Integer.MAX_VALUE, "memory", "inventory", "");
+        this.leftHand = new Container(Integer.MAX_VALUE, Double.MAX_VALUE, 1, "left hand", "inventory", "");
+        this.rightHand = new Container(Integer.MAX_VALUE, Double.MAX_VALUE, 1, "right hand", "inventory", "");
 
         this.knownFurniture = new HashSet<>();
         this.knownItems = new HashSet<>();
@@ -163,20 +163,23 @@ public class Player {
             i++;
         }
 
-        System.out.println("Items:");
-        i = 1;
-        for (Item item : this.knownItems) {
-            System.out.printf("%s: %s\n", i, item.getName());
-            i++;
+        if (this.knownItems != null && !this.knownItems.isEmpty()) {
+            System.out.println("Items:");
+            i = 1;
+            for (Item item : this.knownItems) {
+                System.out.printf("%s: %s\n", i, item.getName());
+                i++;
+            }
         }
     }
 
-    private Item getKnownItem(int itemID) {
+    public Item getKnownItem(int itemID) {
         int i = 1;
         for (Item item : this.knownItems) {
             if (i == itemID) {
                 return item;
             }
+            i++;
         }
 
         throw new InputMismatchException("There is no item with this id");
@@ -184,7 +187,38 @@ public class Player {
 
     public void move(Direction direction) {
         Door door = currentRoom.getDoor(direction);
-        Room room = door.traverse(direction);
+        Room room = null;
+        try {
+            room = door.traverse(direction);
+        }
+        catch (RuntimeException e) {
+            try {
+                Item leftItem = leftHand.fetchItem();
+                if (leftItem instanceof Key) {
+                    door.tryUnlock((Key)leftItem);
+                }
+            }
+            catch (Exception ignored) {
+
+            }
+
+            try {
+                Item rightItem = rightHand.fetchItem();
+                if (rightItem instanceof Key) {
+                    door.tryUnlock((Key)rightItem);
+                }
+            }
+            catch (Exception ignored) {
+                System.out.println("error");
+            }
+
+            if (door.isLocked()) {
+                throw e;
+            }
+
+            room = door.traverse(direction);
+        }
+
         this.currentRoom = room;
         this.setX(room.getX());
         this.setY(room.getY());
@@ -203,7 +237,15 @@ public class Player {
         for (Furniture furniture : this.knownFurniture) {
             if (String.valueOf(i).equals(furnitureID)) {
                 furniture.check(this.getAllUncovers());
-                this.knownItems.addAll(furniture.getCheckedItems());
+                HashSet<Item> checkedItems = furniture.getCheckedItems();
+                this.knownItems.addAll(checkedItems);
+                if (checkedItems.isEmpty()) {
+                    System.out.println("You did not find anything worth wile");
+                }
+                else {
+                    System.out.println("You found some items:");
+                    printAllFurnitureAndItems();
+                }
                 return;
             }
             i++;
@@ -305,5 +347,44 @@ public class Player {
         else {
             this.leftHand.stashItem(item);
         }
+    }
+
+    public String getInventory() {
+        StringBuilder result = new StringBuilder();
+        if (!leftHand.getContents().isEmpty()) {
+            result.append(String.format("Left Hand: %s\t\t\t", this.leftHand.fetchItem().getName()));
+        }
+        else {
+            result.append(String.format("Left Hand: %s\t\t\t", "Empty"));
+        }
+
+        if (!rightHand.getContents().isEmpty()) {
+            result.append(String.format("Right Hand: %s\n", this.rightHand.fetchItem().getName()));
+        }
+        else {
+            result.append(String.format("Right Hand: %s\n", "Empty"));
+        }
+
+        if (backpack != null && !backpack.getContents().isEmpty()) {
+            result.append("Backpack:\n\n");
+            int i = 0;
+            for (Item item : backpack.getContents().values()) {
+                result.append(String.format("%s: %s\n", i, item.getName()));
+                i++;
+            }
+        }
+
+        if (!memory.getContents().isEmpty()) {
+            result.append("Notes:\n\n");
+
+            for (Item item : memory.getContents().values()) {
+                Note note =  (Note) item;
+                result.append(String.format("%s\n", note.getText()));
+            }
+        }
+
+        result.append("\n");
+
+        return result.toString();
     }
 }

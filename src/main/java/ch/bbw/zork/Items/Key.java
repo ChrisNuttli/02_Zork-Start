@@ -1,39 +1,37 @@
 package ch.bbw.zork.Items;
 
+import ch.bbw.zork.Lock;
 import ch.bbw.zork.interfaces.Unlock;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 public class Key extends Item implements Unlock {
-    private HashMap<String, String> unlockMessages;
-    private boolean usedUnlock;
+    private HashMap<Lock, String> unlockMessages;
 
-    public Key(String lockID) {
+    public Key() {
         super("Key", "A small metal key that looks like it could open a lock.", 1, 0.2);
         this.unlockMessages = new HashMap<>();
     }
 
     @Override
-    public Set<String> getLockIDs() {
-        return this.unlockMessages.keySet();
+    public HashSet<Lock> getLocks() {
+        return new HashSet<>(this.unlockMessages.keySet());
     }
 
     @Override
-    public void addUnlockMessage(String lockID, String unlockMessages) {
-        this.unlockMessages.put(lockID, unlockMessages);
+    public void addUnlockMessage(Lock lock, String unlockMessages) {
+        this.unlockMessages.put(lock, unlockMessages);
     }
 
     @Override
-    public String getUnlockMessage(String lockID) {
-        return this.unlockMessages.get(lockID);
+    public String getUnlockMessage(Lock lock) {
+        return this.unlockMessages.get(lock);
     }
 
-    public boolean getUsedUnlock() {
-        return this.usedUnlock;
-    }
-
-    public void setUsedUnlock(boolean usedUnlock) {
-        this.usedUnlock = usedUnlock;
+    @Override
+    public int getMaxDepth() {
+        return 0;
     }
 }

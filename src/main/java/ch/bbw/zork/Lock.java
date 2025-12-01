@@ -34,7 +34,9 @@ public class Lock {
     }
 
     private Key generateKey() {
-        return new Key(this.lockID);
+        Key key = new Key();
+        key.addUnlockMessage(this, "You turn the key and open the door successfully!");
+        return key;
     }
 
     private String generateCode() {
@@ -47,10 +49,10 @@ public class Lock {
         }
 
         if (!locked) {
-            throw new IllegalStateException("Lock is already unlocked");
+            return true;
         }
 
-        if (key.getLockIDs().contains(this.lockID)) {
+        if (this.key == key || key.getLocks().contains(this)) {
             this.locked = false;
         }
 
@@ -63,7 +65,7 @@ public class Lock {
         }
 
         if (!locked) {
-            throw new IllegalStateException("Lock is already unlocked");
+            return true;
         }
 
         if (this.code.equals(code)) {

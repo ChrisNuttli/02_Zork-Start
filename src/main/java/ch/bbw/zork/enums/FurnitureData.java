@@ -31,7 +31,7 @@ public enum FurnitureData {
     BED(
             "bed",
             "A comfortable bed",
-            "Under the Bed",
+            "under the Bed",
             new String[]{"Under the Bed"},
             new ItemData[][] {
                     new ItemData[] {
@@ -76,7 +76,7 @@ public enum FurnitureData {
     WARDROBE(
             "wardrobe",
             "A large wardrobe",
-            "Behind a fake wall",
+            "behind a fake wall",
             new String[]{"Main compartment", "Drawer"},
             new ItemData[][] {
                     new ItemData[] {
@@ -166,7 +166,7 @@ public enum FurnitureData {
     SHELF(
             "shelf",
             "A storage shelf",
-            "Behind a hidden door at the back",
+            "behind a hidden door at the back",
             new String[]{"Shelf top"},
             new ItemData[][] {
                     new ItemData[] {
@@ -191,7 +191,7 @@ public enum FurnitureData {
     CABINET(
             "cabinet",
             "A storage cabinet",
-            "Under a fake floor",
+            "under a fake floor",
             new String[]{"Left Door", "Right Door"},
             new ItemData[][] {
                     new ItemData[] {
@@ -298,7 +298,7 @@ public enum FurnitureData {
     COAT_RACK(
             "coat rack",
             "A rack for coats",
-            "Behind a sliding door in the wall",
+            "behind a sliding door in the wall",
             null,
             null,
             null
@@ -393,7 +393,7 @@ public enum FurnitureData {
     TV_STAND(
             "tv stand",
             "A stand for a television",
-            "Behind the TV",
+            "behind the TV",
             null,
             null,
             null
@@ -401,7 +401,7 @@ public enum FurnitureData {
     FILING_CABINET(
             "filing cabinet",
             "An office filing cabinet",
-            "Behind the drawer built into the wall",
+            "behind the drawer built into the wall",
             new String[]{"Top Drawer", "Bottom Drawer"},
             new ItemData[][] {
                     new ItemData[] {

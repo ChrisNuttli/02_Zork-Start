@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Zork2 {
-    public static boolean DEBUG = true;
+    public static boolean DEBUG = false;
     private static Parser parser = new Parser(System.in);
     public final static List<String> validCommands = Arrays.asList("help",
         "move",
@@ -20,6 +20,7 @@ public class Zork2 {
     );
 
 	public static void main(String[] args) {
+        Parser.clearScreen();
         System.out.println("Welcome to the Zork Game!");
 //        parser = new Parser(System.in);
         boolean quit = false;

@@ -10,7 +10,7 @@ public class Backpack extends Item implements Storage {
 
     public Backpack() {
         super("Backpack", "A handy backpack with a lot of space");
-        this.contents = new Container(30, 30);
+        this.contents = new Container(30, 30, "backpack", "backpack", "");
     }
 
     @Override

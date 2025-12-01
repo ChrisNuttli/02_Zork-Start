@@ -1,12 +1,13 @@
 package ch.bbw.zork;
 
 import ch.bbw.zork.enums.Direction;
+import ch.bbw.zork.enums.LockType;
 import ch.bbw.zork.enums.RoomData;
 import ch.bbw.zork.interfaces.Unlock;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Iterator;
 
 public class Door {
 	private HashMap<Direction, Room> rooms;
@@ -92,6 +93,11 @@ public class Door {
     }
 
     public void setLock(Lock lock) {
+        if (this.lock != null) {
+            Game.getHouse().removeItem(lock.getKey());
+            return;
+//            throw new IllegalStateException("Door already has a lock");
+        }
         this.lock = lock;
     }
 
@@ -114,6 +120,10 @@ public class Door {
         }
     }
 
+    public void lockDoor() {
+        setLock(new Lock(LockType.KEY_HOLE));
+    }
+
     public Room traverse(Direction direction) {
         if (this.lock != null && this.lock.isLocked()) {
             throw new RuntimeException("The door seems to be locked.");
@@ -129,5 +139,11 @@ public class Door {
         }
 
         return score;
+    }
+
+    @Override
+    public String toString() {
+        Iterator<Room> roomIterator = this.rooms.values().iterator();
+        return String.format("Locked: %s\tRoomA: %s\t\t\tRoomB: %s", isLocked(), roomIterator.next().getName(), roomIterator.next().getName());
     }
 }

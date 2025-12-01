@@ -11,6 +11,7 @@ public class TimeNote extends Note implements IncreaseTime {
         super("A Note with a message written for one of the residents");
         this.increased = false;
         this.timeIncrease = Game.getRandom().nextInt(80) + 10;
+        this.setText(getMessage(this.timeIncrease));
     }
 
     private static String getMessage(int time) {

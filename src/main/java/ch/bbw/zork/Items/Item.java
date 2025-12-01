@@ -1,12 +1,17 @@
 package ch.bbw.zork.Items;
 
+import ch.bbw.zork.Container;
+import ch.bbw.zork.Furniture;
 import ch.bbw.zork.Game;
 import ch.bbw.zork.enums.FurnitureData;
 import ch.bbw.zork.enums.ItemData;
 import ch.bbw.zork.interfaces.Hidden;
+import ch.bbw.zork.interfaces.HidingSpot;
+import ch.bbw.zork.interfaces.Storage;
 import ch.bbw.zork.interfaces.Uncover;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.UUID;
 
 public class Item implements Hidden {
@@ -16,7 +21,7 @@ public class Item implements Hidden {
     private final int space;
     private final double weight;
     private boolean uncovered = true;
-    private ArrayList<String> uncoverIDs;
+    private HashSet<Uncover> uncovers;
     private ItemData itemData;
 
     protected Item(String name, String description) {
@@ -33,56 +38,50 @@ public class Item implements Hidden {
         Game.getHouse().addItem(this);
 	}
 
-    @Override
-    public ArrayList<String> getUncoverIDs() {
-        return this.uncoverIDs;
-    }
-
-    @Override
-    public void addUncoverID(String uncoverID) {
-        this.uncoverIDs.add(uncoverID);
-        this.uncovered = false;
-    }
-
-    @Override
-    public boolean getIsUncovered() {
-        return this.uncovered;
-    }
-
-    @Override
-    public void setIsUncovered(boolean isUncovered) {
-        this.uncovered = isUncovered;
-    }
-
-    @Override
-    public boolean tryUncover(String uncoverID) {
-        if (this.uncovered) { return true; }
-        boolean result = this.uncoverIDs.contains(uncoverID);
-        if (result) {
-            this.uncovered = true;
-        }
-        return result;
-    }
-
-    @Override
-    public boolean tryUncover(ArrayList<Uncover> uncovers) {
-        for (Uncover uncover : uncovers) {
-            if (tryUncover(uncover.getUncoverID())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    @Override
     public String getName() {
         return this.name;
     }
 
     @Override
-    public LocationNote generatLocationNote(FurnitureData hidingSpot) {
-        return new LocationNote("", LocationNote.getRandomText(hidingSpot, this));
+    public HashSet<Uncover> getUncoverItems() {
+        return this.uncovers;
+    }
+
+    @Override
+    public void addUncoverItem(Uncover uncover) {
+        this.uncovers.add(uncover);
+        this.uncovered = false;
+    }
+
+    @Override
+    public boolean isUncovered() {
+        return this.uncovered;
+    }
+
+
+    @Override
+    public void tryUncover(Uncover uncover) {
+        if (this.uncovered) { return; }
+        boolean result = this.uncovers.contains(uncover);
+        if (result) {
+            this.uncovered = true;
+        }
+    }
+
+    @Override
+    public void tryUncover(ArrayList<Uncover> uncovers) {
+        for (Uncover uncover : uncovers) {
+            tryUncover(uncover);
+        }
+    }
+
+    @Override
+    public void generateLocationNote(HidingSpot hidingSpot) {
+        if (hidingSpot instanceof Furniture) {
+            throw new UnsupportedOperationException("Cannot hide Item in Furniture!");
+        }
+
+        hidingSpot.generateLocationNote(this);
     }
 
     public String getDescription() {

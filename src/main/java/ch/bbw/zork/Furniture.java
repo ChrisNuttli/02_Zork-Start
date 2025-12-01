@@ -4,31 +4,36 @@ import ch.bbw.zork.Items.Item;
 import ch.bbw.zork.Items.LocationNote;
 import ch.bbw.zork.enums.FurnitureData;
 import ch.bbw.zork.enums.LockType;
-import ch.bbw.zork.interfaces.Hidden;
+import ch.bbw.zork.interfaces.HidingSpot;
 import ch.bbw.zork.interfaces.Uncover;
+import ch.bbw.zork.interfaces.Hidden;
 
 import java.util.*;
 
-public class Furniture {
+public class Furniture implements HidingSpot {
     private final String furnitureID;
 	private final String name;
 	private final String description;
 	private HashMap<String, Container> storage;
     private final FurnitureData furnitureData;
     private final ArrayList<String> uncoverIDs;
+    private final String roomName;
     private boolean uncovered;
     private Lock lock;
     private HashSet<Item> checkedItems;
+    private Safe safe;
 
-    public Furniture(FurnitureData furnitureData) {
+    public Furniture(FurnitureData furnitureData, String roomName) {
         this.furnitureID = UUID.randomUUID().toString();
         this.furnitureData = furnitureData;
         this.name = furnitureData.getName();
         this.description = furnitureData.getDescription();
+        this.roomName = roomName;
         if (!furnitureData.getContainerNames().isEmpty()) {
             this.storage = new HashMap<>();
             for (String name : furnitureData.getContainerNames()) {
-                this.storage.put(name, new Container());
+                Container newCont = new Container(name, this.name, roomName);
+                this.storage.put(name.toLowerCase(), newCont);
             }
         }
         this.uncoverIDs = new ArrayList<>();
@@ -99,29 +104,49 @@ public class Furniture {
     }
 
     public void check(ArrayList<Uncover> uncovers) {
-        if (this.storage.isEmpty()) {
-            System.err.println("Nothing to see here");
+        if (this.storage == null || this.storage.isEmpty()) {
+//            System.err.println("Nothing to see here");
             return;
         }
 
         String selectedStorage = "";
+        Container container = null;
+
         if (this.storage.size() > 1) {
             System.out.printf("The %s has multiple parts that can be checked:\n", this.name);
-            for (String storage : this.storage.keySet()) {
-                System.out.println(storage);
+            int i = 1;
+            HashMap<Integer, Container> containersById = new HashMap<>();
+
+            for (Container storage : this.storage.values()) {
+                System.out.printf("%s:\t%s\n", i, storage.getName());
+                containersById.put(i, storage);
+                i++;
             }
 
-            selectedStorage = Zork2.getParser().promptInput("Which part would you like to check?");
-            while (!storage.containsKey(selectedStorage)) {
-                System.out.printf("Option %s does not exist\n", selectedStorage);
-                selectedStorage = Zork2.getParser().promptInput("Which part would you like to check?");
+            selectedStorage = Zork2.getParser().promptInput("\nWhich part would you like to check?\n");
+            try {
+                int selectedID = Integer.parseInt(selectedStorage);
+                Container cont = containersById.get(selectedID);
+                if (cont == null || cont.getContents().isEmpty()) {
+                    System.out.printf("No option with id '%s' exists\n", selectedID);
+                    return;
+                }
+                container = cont;
+            }
+            catch (NumberFormatException ignored) {
+                if (!storage.containsKey(selectedStorage.toLowerCase())) {
+                    System.out.printf("Option '%s' does not exist\n", selectedStorage);
+                    return;
+                }
+
+                container = this.storage.get(selectedStorage);
             }
         }
         else {
             selectedStorage = this.storage.keySet().iterator().next();
+            container = this.storage.get(selectedStorage);
         }
 
-        Container container = this.storage.get(selectedStorage);
         container.check(uncovers);
         if (container.getCheckedItems().isEmpty()) {
             System.out.println("There is nothing to be found");
@@ -154,5 +179,86 @@ public class Furniture {
 //        }
 //
 //        Game.getParser().setLoadedItemList(itemList);
+    }
+
+    private ArrayList<Container> getContainersShuffled() {
+        ArrayList<Container> containers = new ArrayList<>();
+        while (containers.size() < this.storage.size())  {
+            int randomInt = Game.getRandom().nextInt(storage.size());
+            int i = 0;
+            for (Container container : this.storage.values()) {
+                if (randomInt == i) {
+                    if (!containers.contains(container)) {
+                        containers.add(container);
+                    }
+                    break;
+                }
+                i++;
+            }
+        }
+
+        return containers;
+    }
+
+    public void hideItem(Hidden hiddenItem) {
+        if (this.storage.isEmpty()) {
+            throw new IllegalStateException("Cannot hide an Item. This Furniture does not have any storage");
+        }
+
+        boolean success = false;
+        for (Container container : this.getContainersShuffled()) {
+            success = true;
+            try {
+                container.stashItem((Item)hiddenItem);
+                hiddenItem.generateLocationNote(container);
+                break;
+            }
+            catch(Exception e) {
+                success = false;
+                container.removeItem((Item)hiddenItem);
+            }
+        }
+
+        if (!success) {
+            throw new RuntimeException("Cannot hide Item");
+        }
+    }
+
+    public void hideSafe() {
+        String hidingSpot = this.furnitureData.getHidingSpot();
+        if (Objects.equals(hidingSpot, "")) {
+            throw new RuntimeException("No hiding spot for safe found");
+        }
+        this.safe = new Safe(roomName);
+        this.generateLocationNote(safe);
+    }
+
+    @Override
+    public void generateLocationNote(Hidden hiddenObject) {
+        if (hiddenObject instanceof Item) {
+            throw new InputMismatchException("Only The Safe can be hidden in furniture.");
+        }
+
+        new LocationNote(this, hiddenObject);
+    }
+
+    @Override
+    public void tryUncoverHiddenItems(Uncover uncover) {
+
+    }
+
+    @Override
+    public String getHidingSpotLabel() {
+        return this.furnitureData.getHidingSpot();
+    }
+
+    @Override
+    public String getRoomName() {
+        return this.roomName;
+    }
+
+    @Override
+    public String getHidingSpotDescription() {
+        return this.furnitureData.getHidingSpot();
     }
 }

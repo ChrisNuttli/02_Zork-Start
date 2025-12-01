@@ -1,13 +1,34 @@
 package ch.bbw.zork.Items;
 
+import ch.bbw.zork.Container;
+import ch.bbw.zork.Furniture;
 import ch.bbw.zork.Game;
 import ch.bbw.zork.enums.FurnitureData;
 import ch.bbw.zork.interfaces.Hidden;
+import ch.bbw.zork.interfaces.HidingSpot;
+import ch.bbw.zork.interfaces.Storage;
 import ch.bbw.zork.interfaces.Uncover;
 
 import java.util.UUID;
 
 public class LocationNote extends Note implements Uncover {
+    private final String[] locationTextTemplates = new String[]{
+            "Remember, the hidden %s can be found %s.",
+            "Don’t forget that the concealed %s is placed %s.",
+            "Just a reminder that the %s you’re looking for is hidden %s.",
+            "In case you need it, the secret %s is stored %s.",
+            "Take note: the missing %s is tucked away %s.",
+            "For your reference, the hidden %s is located %s.",
+            "Please remember that the concealed %s has been left %s.",
+            "If you’re searching later, the %s is hidden %s.",
+            "Make sure you recall that the %s is kept %s.",
+            "Just so you know, the hidden %s remains %s."
+    };
+
+    private final String[] uncoverMessageTemplates = new String[]{
+            "You take a glance %s and spot a %s!",
+    };
+
     private final String uncoverID;
     private final String uncoverMessage;
     private boolean usedUncovered;
@@ -16,6 +37,14 @@ public class LocationNote extends Note implements Uncover {
         super("A written reminder for one of the residents", text);
         this.uncoverID = UUID.randomUUID().toString();
         this.uncoverMessage = uncoverMessage;
+    }
+
+    public LocationNote(HidingSpot hidingSpot, Hidden hiddenObject) {
+        super("A written reminder for one of the residents");
+        this.setText(getRandomText(hidingSpot, hiddenObject));
+        this.uncoverID = UUID.randomUUID().toString();
+        this.uncoverMessage = getUncoverMessage(hidingSpot, hiddenObject);
+        this.setText(getRandomText(hidingSpot, hiddenObject));
     }
 
     @Override
@@ -36,29 +65,13 @@ public class LocationNote extends Note implements Uncover {
         this.usedUncovered = usedUncover;
     }
 
-    public static String getRandomText(FurnitureData concealingFurniture, Hidden hiddenFurniture) {
-        int index = Game.getRandom().nextInt( 10);
-        switch(index) {
-            case 0:
-                return String.format("Remember, the hidden %s can be found at %s.", hiddenFurniture.getName(), concealingFurniture.getHidingSpot());
-            case 1:
-                return String.format("Don’t forget that the concealed %s is placed at %s.", hiddenFurniture.getName(), concealingFurniture.getHidingSpot());
-            case 2:
-                return String.format("Just a reminder that the %s you’re looking for is hidden at %s.", hiddenFurniture.getName(), concealingFurniture.getHidingSpot());
-            case 3:
-                return String.format("In case you need it, the secret %s is stored at %s.", hiddenFurniture.getName(), concealingFurniture.getHidingSpot());
-            case 4:
-                return String.format("Take note: the missing %s is tucked away at %s.", hiddenFurniture.getName(), concealingFurniture.getHidingSpot());
-            case 5:
-                return String.format("For your reference, the hidden %s is located at %s.", hiddenFurniture.getName(), concealingFurniture.getHidingSpot());
-            case 6:
-                return String.format("Please remember that the concealed %s has been left at %s.", hiddenFurniture.getName(), concealingFurniture.getHidingSpot());
-            case 7:
-                return String.format("If you’re searching later, the %s is hidden at %s.", hiddenFurniture.getName(), concealingFurniture.getHidingSpot());
-            case 8:
-                return String.format("Make sure you recall that the %s is kept at %s.", hiddenFurniture.getName(), concealingFurniture.getHidingSpot());
-            default:
-                return String.format("Just so you know, the hidden %s remains at %s.", hiddenFurniture.getName(), concealingFurniture.getHidingSpot());
-        }
+    private String getRandomText(HidingSpot hs, Hidden hiddenObject) {
+        int index = Game.getRandom().nextInt(this.locationTextTemplates.length);
+        return String.format(this.locationTextTemplates[index], hiddenObject.getName(), String.format("%s in the %s", hs.getHidingSpotDescription(), hs.getRoomName()));
+    }
+
+    private String getUncoverMessage(HidingSpot hs, Hidden hiddenObject) {
+        int index = Game.getRandom().nextInt(this.uncoverMessageTemplates.length);
+        return String.format(this.uncoverMessageTemplates[index], hs.getHidingSpotLabel(), hiddenObject.getName());
     }
 }

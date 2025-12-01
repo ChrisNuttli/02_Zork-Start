@@ -1,9 +1,13 @@
 package ch.bbw.zork.interfaces;
 
+import ch.bbw.zork.Lock;
+
+import java.util.HashSet;
 import java.util.Set;
 
 public interface Unlock {
-    public Set<String> getLockIDs();
-    public void addUnlockMessage(String lockID, String unlockMessages);
-    public String getUnlockMessage(String lockID);
+    public HashSet<Lock> getLocks();
+    public void addUnlockMessage(Lock lock, String unlockMessages);
+    public String getUnlockMessage(Lock lock);
+    public int getMaxDepth();
 }
