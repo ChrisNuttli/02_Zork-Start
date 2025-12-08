@@ -165,13 +165,11 @@ public class Container implements Storage, HidingSpot {
         }
 
         Item hiddenItem = (Item) hiddenObject;
-
-
     }
 
     @Override
     public void tryUncoverHiddenItems(Uncover uncover) {
-
+        // TODO: Implement Method
     }
 
     @Override

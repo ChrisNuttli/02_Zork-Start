@@ -3,10 +3,8 @@ package ch.bbw.zork;
 import ch.bbw.zork.Items.*;
 import ch.bbw.zork.enums.*;
 import ch.bbw.zork.enums.FurnitureData;
-import ch.bbw.zork.interfaces.Hidden;
 import ch.bbw.zork.interfaces.Unlock;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 import static ch.bbw.zork.Constants.*;
@@ -72,52 +70,8 @@ public class House {
         generateItems();
         generateSafe();
         placeItems(frontDoorKey);
-//        hideItems(frontDoorKey);
 
         if (Zork2.DEBUG) System.out.println("Done!");
-    }
-
-    private void hideItems(Item frontDoorKey) {
-        HashSet<Unlock> unlockItems = new HashSet<>();
-        for (Item item : itemList) {
-            if (item == frontDoorKey) {
-                continue;
-            }
-            if (item instanceof Unlock) {
-                unlockItems.add((Unlock) item);
-            }
-        }
-
-        for (Unlock unlock : unlockItems) {
-            hideInRandomRoom((Hidden) unlock);
-        }
-    }
-
-    private void hideInRandomRoom(Hidden item) {
-        int randomInt;
-        ArrayList<Room> rooms = new ArrayList<>(roomList);
-        ArrayList<Room> roomCandidates = new ArrayList<>(rooms);
-
-        while (!roomCandidates.isEmpty()) {
-            int i = 0;
-            randomInt = Game.getRandom().nextInt(roomList.size());
-            roomCandidates = new ArrayList<>(rooms);
-
-            for (Room room : roomCandidates) {
-                if (randomInt == i) {
-                    try {
-                        room.placeItem((Item)item);
-                        return;
-                    }
-                    catch(Exception ignored) {
-                        break;
-                    }
-                }
-                i++;
-            }
-        }
-
-        throw new RuntimeException("Could not hide the Item in any Room");
     }
 
     private void placeItems(Item frontDoorKey) {
@@ -133,7 +87,7 @@ public class House {
                 itemDepth = ((Unlock) item).getMaxDepth();
             }
 
-            Room[] rooms = (Room[])getShuffledList(roomList);
+            Room[] rooms = (Room[])Helper.getShuffledList(roomList);
             int successInit = success;
 
             for (Room room : rooms) {
@@ -159,37 +113,6 @@ public class House {
         for (Item item : failItems) {
             this.itemList.remove(item);
         }
-    }
-
-    private <T> T[] getShuffledList(HashSet<T> orderedList) {
-        HashSet<T> unusedList =  new HashSet<>(orderedList);
-        HashSet<T> list =  new HashSet<>(orderedList);
-        T ele = list.iterator().next();
-        @SuppressWarnings("unchecked")
-        T[] result = (T[]) Array.newInstance(ele.getClass(), orderedList.size());
-        int done = 0;
-
-        while (!unusedList.isEmpty())  {
-            list.clear();
-            list.addAll(unusedList);
-            int randomInt = 0;
-            if (!list.isEmpty()) {
-                randomInt = Game.getRandom().nextInt(list.size());
-            }
-            int i = 0;
-
-            for (T element : list) {
-                if (randomInt == i) {
-                    result[done] = element;
-                    done++;
-                    unusedList.remove(element);
-                    break;
-                }
-                i++;
-            }
-        }
-
-        return (T[])result;
     }
 
     private void generateRooms() {
@@ -232,7 +155,7 @@ public class House {
             }
         }
 
-        // Remove invalid doorframes from corridors
+        // Remove invalid door frames from corridors
         for (Room room : roomList) {
             if (room.getRoomData() == RoomData.CORRIDOR) {
                 HashSet<Direction> frames = new HashSet<>(room.getDoorFrames());
@@ -317,7 +240,7 @@ public class House {
 
         int success = 0;
         for (int i = 0; i < LOCKED_DOORS_COUNT; i++) {
-            Room[] shuffledRoomList = getShuffledList(roomList);
+            Room[] shuffledRoomList = Helper.getShuffledList(roomList);
 
             for (Room room : shuffledRoomList) {
                 if (room.getRoomData() == RoomData.FRONT_YARD) {
@@ -325,7 +248,7 @@ public class House {
                 }
 
                 int successInit = success;
-                Door[] shuffledDoors = getShuffledList(room.getDoors());
+                Door[] shuffledDoors = Helper.getShuffledList(room.getDoors());
                 for (Door door : shuffledDoors) {
                     try {
                         door.lockDoor();
@@ -398,17 +321,6 @@ public class House {
             }
             throw new IllegalStateException("Safe was not able to be generated!");
         }
-    }
-
-    private ArrayList<FurnitureData> getFurnitureDataForRoom(RoomData roomData) {
-        ArrayList<FurnitureData> furnitureData = new ArrayList<>();
-        for (FurnitureData fd : FURNITURE_DATA_LIST) {
-            if (fd.getMax(roomData) > 0) {
-                furnitureData.add(fd);
-            }
-        }
-
-        return furnitureData;
     }
 
     public ArrayList<RoomData> getCandidatesForCoordinates(int[] coordinates) {
@@ -559,7 +471,7 @@ public class House {
         return candidates;
     }
 
-    private Room getRoom(int[] coords) {
+    public Room getRoom(int[] coords) {
         return this.getRoom(coords[0], coords[1]);
     }
 
@@ -568,7 +480,17 @@ public class House {
             return null;
         }
 
-        return findRoomByCoordinates(x, y);
+        return getRoom(x, y);
+    }
+
+    public Room getRoom(RoomData roomData) {
+        for (Room room : roomList) {
+            if (room.getRoomData().equals(roomData)) {
+                return room;
+            }
+        }
+
+        return null;
     }
 
     public void addRoom(Room room) {
@@ -612,46 +534,8 @@ public class House {
         return result;
     }
 
-    public Room findRoomByCoordinates(int[] coordinates) {
-        return findRoomByCoordinates(coordinates[0], coordinates[1]);
-    }
-
-    public Room findRoomByCoordinates(int x, int y) {
-        for (Room room : roomList) {
-            if (room.getX() == x && room.getY() == y) return room;
-        }
-
-        return null;
-    }
-
-    public Room getRoom(RoomData roomData) {
-        for (Room room : roomList) {
-            if (room.getRoomData().equals(roomData)) {
-                return room;
-            }
-        }
-
-        return null;
-    }
-
-    public Room getPlayerLocation() {
-        Player player = Game.getPlayer();
-        int x =  player.getX();
-        int y = player.getY();
-        return getRoom(x, y);
-    }
-
     public void removeItem(Item item) {
         this.itemList.remove(item);
-    }
-
-    public ArrayList<RoomData> getUsedRoomTypes() {
-        ArrayList<RoomData> roomTypeList = new ArrayList<>();
-        for (Room room : roomList) {
-            roomTypeList.add(room.getRoomData());
-        }
-
-        return roomTypeList;
     }
 
     public String getMap() {
@@ -717,17 +601,6 @@ public class House {
         }
 
         return new ArrayList<>(roomDataList);
-    }
-
-    public int countRoom(RoomData roomData) {
-        int count = 0;
-        for (Room room : roomList) {
-            if (room.getRoomData() == roomData) {
-                count++;
-            }
-        }
-
-        return count;
     }
 
     private int getMaxDepth() {

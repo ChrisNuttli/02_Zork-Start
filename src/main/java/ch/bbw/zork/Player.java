@@ -40,47 +40,11 @@ public class Player {
         return name;
     }
 
-    public int getX() {
-        return x;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    public Backpack getBackpack() {
-        return backpack;
-    }
-
     private void setBackpack(Backpack backpack) {
         if (this.backpack != null) {
             throw new RuntimeException("You are already wearing a backpack");
         }
         this.backpack = backpack;
-    }
-
-    public HashSet<Furniture> getKnownFurniture() {
-        return knownFurniture;
-    }
-
-    public void setKnownFurniture(HashSet<Furniture> knownFurniture) {
-        this.knownFurniture = knownFurniture;
-    }
-
-    public HashSet<Item> getKnownItems() {
-        return knownItems;
-    }
-
-    public void setKnownItems(HashSet<Item> knownItems) {
-        this.knownItems = knownItems;
     }
 
     public Room getCurrentRoom() {
@@ -89,12 +53,6 @@ public class Player {
 
     public void setCurrentRoom(Room currentRoom) {
         this.currentRoom = currentRoom;
-        currentRoom.enter();
-    }
-
-    public void spawn(Room spawnRoom) {
-        spawnRoom.firstEnter();
-        this.currentRoom = spawnRoom;
     }
 
     private Item dropLeftHandItem() {
@@ -220,8 +178,6 @@ public class Player {
         }
 
         this.currentRoom = room;
-        this.setX(room.getX());
-        this.setY(room.getY());
 
         room.enter();
     }

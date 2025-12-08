@@ -22,7 +22,6 @@ public class Zork2 {
 	public static void main(String[] args) {
         Parser.clearScreen();
         System.out.println("Welcome to the Zork Game!");
-//        parser = new Parser(System.in);
         boolean quit = false;
         while (!quit) {
             switch(parser.chooseOption("Choose an option: ", new String[]{ "New Game", "Exit" })) {

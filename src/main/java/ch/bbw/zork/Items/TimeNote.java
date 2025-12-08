@@ -1,9 +1,8 @@
 package ch.bbw.zork.Items;
 
 import ch.bbw.zork.Game;
-import ch.bbw.zork.interfaces.IncreaseTime;
 
-public class TimeNote extends Note implements IncreaseTime {
+public class TimeNote extends Note {
     private int timeIncrease;
     private boolean increased;
 
@@ -32,22 +31,18 @@ public class TimeNote extends Note implements IncreaseTime {
         }
     }
 
-    @Override
     public void setTimeIncrease(int time) {
         this.timeIncrease = time;
     }
 
-    @Override
     public int getTimeIncrease() {
         return this.timeIncrease;
     }
 
-    @Override
     public boolean wasIncreased() {
         return increased;
     }
 
-    @Override
     public void setWasIncreased(boolean wasIncreased) {
         this.increased = wasIncreased;
     }

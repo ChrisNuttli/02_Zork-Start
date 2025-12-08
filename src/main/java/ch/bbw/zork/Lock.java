@@ -43,44 +43,36 @@ public class Lock {
         return String.format("%s", Game.getRandom().nextInt(9999));
     }
 
-    public boolean tryUnlock(Unlock key) {
+    public void tryUnlock(Unlock key) {
         if (!Objects.equals(this.lockType, LockType.KEY_HOLE)) {
             throw new RuntimeException("This lock cannot be unlocked using a key");
         }
 
         if (!locked) {
-            return true;
+            return;
         }
 
         if (this.key == key || key.getLocks().contains(this)) {
             this.locked = false;
         }
-
-        return !locked;
     }
 
-    public boolean tryUnlock(String code) {
+    public void tryUnlock(String code) {
         if (!Objects.equals(this.lockType, LockType.NUMPAD)) {
             throw new RuntimeException("This lock cannot be opened using a code!");
         }
 
         if (!locked) {
-            return true;
+            return;
         }
 
         if (this.code.equals(code)) {
             this.locked = false;
         }
-
-        return !locked;
     }
 
     public String getName() {
         return name;
-    }
-
-    public String getDescription() {
-        return description;
     }
 
     public boolean isLocked() {

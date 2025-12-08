@@ -24,11 +24,12 @@ public class Item implements Hidden {
     private HashSet<Uncover> uncovers;
     private ItemData itemData;
 
-    protected Item(String name, String description) {
-        this(name, description, 0, 0);
+    public Item(ItemData itemData) {
+        this(itemData.name(), itemData.getDescription(), itemData.getSpace(), itemData.getWeight());
+        this.itemData = itemData;
     }
 
-	public Item(String name, String description, int space, double weight) {
+	protected Item(String name, String description, int space, double weight) {
 		this.name = name;
 		this.description = description;
         this.space = space;
@@ -102,9 +103,5 @@ public class Item implements Hidden {
 
     public ItemData getItemData() {
         return itemData;
-    }
-
-    public void setItemData(ItemData itemData) {
-        this.itemData = itemData;
     }
 }

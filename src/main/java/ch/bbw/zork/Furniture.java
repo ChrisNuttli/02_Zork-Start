@@ -16,7 +16,6 @@ public class Furniture implements HidingSpot {
 	private final String description;
 	private HashMap<String, Container> storage;
     private final FurnitureData furnitureData;
-    private final ArrayList<String> uncoverIDs;
     private final String roomName;
     private boolean uncovered;
     private Lock lock;
@@ -36,7 +35,6 @@ public class Furniture implements HidingSpot {
                 this.storage.put(name.toLowerCase(), newCont);
             }
         }
-        this.uncoverIDs = new ArrayList<>();
         this.checkedItems = new HashSet<>();
 
         Game.getHouse().addFurniture(this);
@@ -49,10 +47,6 @@ public class Furniture implements HidingSpot {
     public String getDescription() {
 		return description;
 	}
-
-    public Container getContainer(String containerName) {
-        return this.storage.get(containerName);
-    }
 
     public Container getContainer() {
         if (this.storage.size() > 1) {
@@ -91,10 +85,6 @@ public class Furniture implements HidingSpot {
         this.lock = lock;
     }
 
-    public String getFurnitureID() {
-        return furnitureID;
-    }
-
     public FurnitureData getFurnitureData() {
         return furnitureData;
     }
@@ -105,7 +95,6 @@ public class Furniture implements HidingSpot {
 
     public void check(ArrayList<Uncover> uncovers) {
         if (this.storage == null || this.storage.isEmpty()) {
-//            System.err.println("Nothing to see here");
             return;
         }
 
@@ -154,31 +143,6 @@ public class Furniture implements HidingSpot {
         }
 
         this.checkedItems.addAll(container.getCheckedItems());
-
-
-//        System.out.println("Found some items:");
-
-//        Player player = Game.getPlayer();
-//
-//        HashMap<Integer, Item> itemList = new HashMap<>();
-//        int i = 0;
-//        for (String itemName : container.getContents().keySet()) {
-//            Item item = container.getContents().get(itemName);
-//            if (!item.getIsUncovered()) {
-//                for (Uncover uncover : player.getAllUncovers()) {
-//                    if (item.tryUncover(uncover.getUncoverID())) {
-//                        break;
-//                    }
-//                }
-//            }
-//
-//            if (item.getIsUncovered()) {
-//                System.out.printf("%s: %s", i, itemName);
-//                itemList.put(i++, item);
-//            }
-//        }
-//
-//        Game.getParser().setLoadedItemList(itemList);
     }
 
     private ArrayList<Container> getContainersShuffled() {
@@ -244,7 +208,7 @@ public class Furniture implements HidingSpot {
 
     @Override
     public void tryUncoverHiddenItems(Uncover uncover) {
-
+        // TODO: Implement Method
     }
 
     @Override
