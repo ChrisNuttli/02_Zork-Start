@@ -63,6 +63,7 @@ public class House {
                     room.lockDoor(dir);
                 }
                 frontDoorKey = itemList.iterator().next();
+                frontDoorKey.setUncovered(false);
                 room.placeItem(frontDoorKey);
             }
         }
@@ -480,7 +481,13 @@ public class House {
             return null;
         }
 
-        return getRoom(x, y);
+        for (Room room : roomList) {
+            if (room.getX() == x && room.getY() == y) {
+                return room;
+            }
+        }
+
+        return null;
     }
 
     public Room getRoom(RoomData roomData) {

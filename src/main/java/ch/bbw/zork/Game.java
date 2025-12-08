@@ -40,6 +40,7 @@ public class Game {
         }
 
         Room frontYard = house.getRoom(RoomData.FRONT_YARD);
+        frontYard.setDiscovered(true);
         player.setCurrentRoom(frontYard);
 
         if (Zork2.DEBUG) {

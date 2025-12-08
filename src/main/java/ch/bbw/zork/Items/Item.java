@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.UUID;
 
 public class Item implements Hidden {
-    private String itemID;
+    private int itemID;
 	private final String name;
 	private final String description;
     private final int space;
@@ -34,6 +34,7 @@ public class Item implements Hidden {
 		this.description = description;
         this.space = space;
         this.weight = weight;
+        this.uncovers = new HashSet<>();
 
         Game.getHouse().addItem(this);
 	}
@@ -62,14 +63,15 @@ public class Item implements Hidden {
     @Override
     public void tryUncover(Uncover uncover) {
         if (this.uncovered) { return; }
-        boolean result = this.uncovers.contains(uncover);
-        if (result) {
-            this.uncovered = true;
-        }
+        this.uncovered = this.uncovers.contains(uncover) || this.uncovers.isEmpty();
     }
 
     @Override
     public void tryUncover(HashSet<Uncover> uncovers) {
+        if (this.uncovers.isEmpty()) {
+            this.uncovered = true;
+        }
+
         for (Uncover uncover : uncovers) {
             tryUncover(uncover);
         }
@@ -84,6 +86,11 @@ public class Item implements Hidden {
         hidingSpot.generateLocationNote(this);
     }
 
+    @Override
+    public void setUncovered(boolean uncovered) {
+        this.uncovered = uncovered;
+    }
+
     public String getDescription() {
 		return description;
 	}
@@ -96,11 +103,11 @@ public class Item implements Hidden {
         return weight;
     }
 
-    public String getItemID() {
+    public int getItemID() {
         return itemID;
     }
 
-    public void setItemID(String id) {
+    public void setItemID(int id) {
         this.itemID = id;
     }
 

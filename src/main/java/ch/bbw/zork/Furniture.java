@@ -11,7 +11,7 @@ import ch.bbw.zork.interfaces.Hidden;
 import java.util.*;
 
 public class Furniture implements HidingSpot {
-    private String furnitureID;
+    private int furnitureID;
 	private final String name;
 	private final String description;
 	private HashMap<String, Container> storage;
@@ -89,11 +89,12 @@ public class Furniture implements HidingSpot {
         return furnitureData;
     }
 
-    public HashSet<Item> getCheckedItems() {
+    public HashSet<Item> getUncoveredItems() {
         HashSet<Item> result = new HashSet<>();
-
-        for (Container container : storage.values()) {
-            result.addAll(container.getCheckedItems());
+        if (this.storage != null) {
+            for (Container container : storage.values()) {
+                result.addAll(container.getCheckedItems());
+            }
         }
 
         return result;
@@ -143,9 +144,6 @@ public class Furniture implements HidingSpot {
         }
 
         container.check(uncovers);
-        if (container.getCheckedItems().isEmpty()) {
-            System.out.println("There is nothing to be found");
-        }
     }
 
     private ArrayList<Container> getContainersShuffled() {
@@ -229,11 +227,11 @@ public class Furniture implements HidingSpot {
         return this.furnitureData.getHidingSpot();
     }
 
-    public String getFurnitureID() {
+    public int getFurnitureID() {
         return furnitureID;
     }
 
-    public void setFurnitureID(String furnitureID) {
+    public void setFurnitureID(int furnitureID) {
         this.furnitureID = furnitureID;
     }
 

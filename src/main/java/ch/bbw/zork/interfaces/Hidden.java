@@ -16,4 +16,5 @@ public interface Hidden {
     public void tryUncover(HashSet<Uncover> uncovers);
     public String getName();
     public void generateLocationNote(HidingSpot hidingSpot);
+    public void setUncovered(boolean uncovered);
 }

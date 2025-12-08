@@ -9,12 +9,12 @@ public class Backpack extends Item implements Storage {
     private Container contents;
 
     public Backpack() {
-        super("Backpack", "A handy backpack with a lot of space");
+        super("Backpack", "A handy backpack with a lot of space", 0, 0);
         this.contents = new Container(30, 30, "backpack", "backpack", "");
     }
 
     @Override
-    public HashMap<String, Item> getContents() {
+    public HashMap<Integer, Item> getContents() {
         return this.contents.getContents();
     }
 
@@ -24,7 +24,7 @@ public class Backpack extends Item implements Storage {
     }
 
     @Override
-    public Item fetchItem(String id) {
+    public Item fetchItem(int id) {
         return this.contents.fetchItem(id);
     }
 
