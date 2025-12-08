@@ -9,7 +9,7 @@ import ch.bbw.zork.interfaces.Uncover;
 import java.util.*;
 
 public class Container implements Storage, HidingSpot {
-    private final String storageID;
+    private String storageID;
     private final String name;
     private final String storageObjectName;
     private final String roomName;
@@ -35,7 +35,6 @@ public class Container implements Storage, HidingSpot {
         this.storageObjectName = storageObjectName;
         this.roomName = roomName;
         this.contents = new HashMap<>();
-        this.storageID = UUID.randomUUID().toString();
         this.slots = slots;
         this.checkedItems = new ArrayList<>();
     }
@@ -121,7 +120,7 @@ public class Container implements Storage, HidingSpot {
         return this.getWeightLimit() - usedWeight;
     }
 
-    public ArrayList<Item> check(ArrayList<Uncover> uncovers) {
+    public ArrayList<Item> check(HashSet<Uncover> uncovers) {
         ArrayList<Item> uncoveredItems = new ArrayList<>();
         for (Item item : getContents().values()) {
             item.tryUncover(uncovers);
@@ -146,8 +145,16 @@ public class Container implements Storage, HidingSpot {
         this.lock = lock;
     }
 
-    public ArrayList<Item> getCheckedItems() {
-        return checkedItems;
+    public HashSet<Item> getCheckedItems() {
+        HashSet<Item> result = new HashSet<>();
+
+        for (Item item: contents.values()) {
+            if (item.isUncovered()) {
+                result.add(item);
+            }
+        }
+
+        return result;
     }
 
     public void removeItem(Item item) {
@@ -185,5 +192,9 @@ public class Container implements Storage, HidingSpot {
     @Override
     public String getRoomName() {
         return roomName;
+    }
+
+    public void setStorageID(String storageID) {
+        this.storageID = storageID;
     }
 }

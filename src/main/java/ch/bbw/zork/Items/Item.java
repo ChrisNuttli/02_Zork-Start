@@ -15,9 +15,9 @@ import java.util.HashSet;
 import java.util.UUID;
 
 public class Item implements Hidden {
+    private String itemID;
 	private final String name;
 	private final String description;
-    private final String itemID;
     private final int space;
     private final double weight;
     private boolean uncovered = true;
@@ -34,7 +34,6 @@ public class Item implements Hidden {
 		this.description = description;
         this.space = space;
         this.weight = weight;
-        this.itemID = UUID.randomUUID().toString();
 
         Game.getHouse().addItem(this);
 	}
@@ -70,7 +69,7 @@ public class Item implements Hidden {
     }
 
     @Override
-    public void tryUncover(ArrayList<Uncover> uncovers) {
+    public void tryUncover(HashSet<Uncover> uncovers) {
         for (Uncover uncover : uncovers) {
             tryUncover(uncover);
         }
@@ -99,6 +98,10 @@ public class Item implements Hidden {
 
     public String getItemID() {
         return itemID;
+    }
+
+    public void setItemID(String id) {
+        this.itemID = id;
     }
 
     public ItemData getItemData() {

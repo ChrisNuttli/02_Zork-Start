@@ -53,7 +53,7 @@ public class Safe extends Furniture implements Hidden {
     }
 
     @Override
-    public void tryUncover(ArrayList<Uncover> uncovers) {
+    public void tryUncover(HashSet<Uncover> uncovers) {
         for (Uncover uncover : uncovers) {
             if (this.isUncovered()) {
                 return;

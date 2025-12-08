@@ -95,8 +95,8 @@ public class Player {
         return keys;
     }
 
-    public ArrayList<Uncover> getAllUncovers() {
-        ArrayList<Uncover> uncovers = new ArrayList<>();
+    public HashSet<Uncover> getAllUncovers() {
+        HashSet<Uncover> uncovers = new HashSet<>();
         for (Item item : this.getAllAvailableItems()) {
             if (item instanceof Uncover) {
                 uncovers.add((Uncover) item);
@@ -184,8 +184,8 @@ public class Player {
 
     public void scan() {
         currentRoom.scan();
-        this.knownFurniture = currentRoom.getScannedFurniture();
-        this.knownItems = currentRoom.getScannedFloorItems();
+//        this.knownFurniture = currentRoom.getScannedFurniture();
+//        this.knownItems = currentRoom.getScannedFloorItems();
     }
 
     public void check(String furnitureID) {
