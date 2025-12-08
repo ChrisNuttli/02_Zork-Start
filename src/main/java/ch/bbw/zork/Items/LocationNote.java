@@ -33,12 +33,6 @@ public class LocationNote extends Note implements Uncover {
     private final String uncoverMessage;
     private boolean usedUncovered;
 
-    public LocationNote(String text, String uncoverMessage) {
-        super("A written reminder for one of the residents", text);
-        this.uncoverID = UUID.randomUUID().toString();
-        this.uncoverMessage = uncoverMessage;
-    }
-
     public LocationNote(HidingSpot hidingSpot, Hidden hiddenObject) {
         super("A written reminder for one of the residents");
         this.setText(getRandomText(hidingSpot, hiddenObject));

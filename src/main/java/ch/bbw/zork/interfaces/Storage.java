@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public interface Storage {
-    public HashMap<String, Item> getContents();
+    public HashMap<Integer, Item> getContents();
     public void stashItem(Item item);
-    public Item fetchItem(String id);
+    public Item fetchItem(int id);
     public int getSpaceLimit();
     public double getWeightLimit();
 }

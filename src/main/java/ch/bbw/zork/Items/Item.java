@@ -15,25 +15,26 @@ import java.util.HashSet;
 import java.util.UUID;
 
 public class Item implements Hidden {
+    private int itemID;
 	private final String name;
 	private final String description;
-    private final String itemID;
     private final int space;
     private final double weight;
     private boolean uncovered = true;
     private HashSet<Uncover> uncovers;
     private ItemData itemData;
 
-    protected Item(String name, String description) {
-        this(name, description, 0, 0);
+    public Item(ItemData itemData) {
+        this(itemData.name(), itemData.getDescription(), itemData.getSpace(), itemData.getWeight());
+        this.itemData = itemData;
     }
 
-	public Item(String name, String description, int space, double weight) {
+	protected Item(String name, String description, int space, double weight) {
 		this.name = name;
 		this.description = description;
         this.space = space;
         this.weight = weight;
-        this.itemID = UUID.randomUUID().toString();
+        this.uncovers = new HashSet<>();
 
         Game.getHouse().addItem(this);
 	}
@@ -62,14 +63,15 @@ public class Item implements Hidden {
     @Override
     public void tryUncover(Uncover uncover) {
         if (this.uncovered) { return; }
-        boolean result = this.uncovers.contains(uncover);
-        if (result) {
-            this.uncovered = true;
-        }
+        this.uncovered = this.uncovers.contains(uncover) || this.uncovers.isEmpty();
     }
 
     @Override
-    public void tryUncover(ArrayList<Uncover> uncovers) {
+    public void tryUncover(HashSet<Uncover> uncovers) {
+        if (this.uncovers.isEmpty()) {
+            this.uncovered = true;
+        }
+
         for (Uncover uncover : uncovers) {
             tryUncover(uncover);
         }
@@ -84,6 +86,11 @@ public class Item implements Hidden {
         hidingSpot.generateLocationNote(this);
     }
 
+    @Override
+    public void setUncovered(boolean uncovered) {
+        this.uncovered = uncovered;
+    }
+
     public String getDescription() {
 		return description;
 	}
@@ -96,15 +103,15 @@ public class Item implements Hidden {
         return weight;
     }
 
-    public String getItemID() {
+    public int getItemID() {
         return itemID;
+    }
+
+    public void setItemID(int id) {
+        this.itemID = id;
     }
 
     public ItemData getItemData() {
         return itemData;
-    }
-
-    public void setItemData(ItemData itemData) {
-        this.itemData = itemData;
     }
 }

@@ -9,7 +9,7 @@ public class Flashlight extends Item implements Uncover {
     public final String uncoverMessage;
 
     public Flashlight() {
-        super("Flashlight", "An average flashlight to illuminate dark spots");
+        super("Flashlight", "An average flashlight to illuminate dark spots", 0, 0);
         this.uncoverID = UUID.randomUUID().toString();
         this.uncoverMessage = "You shine the Flashlight in a dark corner and discover something hidden!";
     }

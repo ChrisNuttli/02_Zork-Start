@@ -12,9 +12,9 @@ public interface Hidden {
     public HashSet<Uncover> getUncoverItems();
     public void addUncoverItem(Uncover uncover);
     public boolean isUncovered();
-//    public void setUncovered(boolean isUncovered);
     public void tryUncover(Uncover uncover);
-    public void tryUncover(ArrayList<Uncover> uncovers);
+    public void tryUncover(HashSet<Uncover> uncovers);
     public String getName();
     public void generateLocationNote(HidingSpot hidingSpot);
+    public void setUncovered(boolean uncovered);
 }

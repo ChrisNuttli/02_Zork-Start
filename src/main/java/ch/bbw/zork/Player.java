@@ -40,47 +40,11 @@ public class Player {
         return name;
     }
 
-    public int getX() {
-        return x;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    public Backpack getBackpack() {
-        return backpack;
-    }
-
     private void setBackpack(Backpack backpack) {
         if (this.backpack != null) {
             throw new RuntimeException("You are already wearing a backpack");
         }
         this.backpack = backpack;
-    }
-
-    public HashSet<Furniture> getKnownFurniture() {
-        return knownFurniture;
-    }
-
-    public void setKnownFurniture(HashSet<Furniture> knownFurniture) {
-        this.knownFurniture = knownFurniture;
-    }
-
-    public HashSet<Item> getKnownItems() {
-        return knownItems;
-    }
-
-    public void setKnownItems(HashSet<Item> knownItems) {
-        this.knownItems = knownItems;
     }
 
     public Room getCurrentRoom() {
@@ -89,19 +53,13 @@ public class Player {
 
     public void setCurrentRoom(Room currentRoom) {
         this.currentRoom = currentRoom;
-        currentRoom.enter();
-    }
-
-    public void spawn(Room spawnRoom) {
-        spawnRoom.firstEnter();
-        this.currentRoom = spawnRoom;
     }
 
     private Item dropLeftHandItem() {
         if (this.rightHand.getContents().isEmpty()) {
             throw new InputMismatchException("You do not hold any items in the left hand!");
         }
-        String itemName = this.leftHand.getContents().keySet().iterator().next();
+        int itemName = this.leftHand.getContents().keySet().iterator().next();
         Item item = this.leftHand.getContents().get(itemName);
         this.leftHand.getContents().remove(itemName);
         return item;
@@ -111,10 +69,21 @@ public class Player {
         if (this.rightHand.getContents().isEmpty()) {
             throw new InputMismatchException("You do not hold any items in the right hand!");
         }
-        String itemName = this.rightHand.getContents().keySet().iterator().next();
+        int itemName = this.rightHand.getContents().keySet().iterator().next();
         Item item = this.rightHand.getContents().get(itemName);
         this.rightHand.getContents().remove(itemName);
         return item;
+    }
+
+    private HashSet<Note> getAllNotes() {
+        HashSet<Note> result = new HashSet<>();
+        for (Item note : this.memory.getContents().values()) {
+            if (note instanceof Note) {
+                result.add((Note)note);
+            }
+        }
+
+        return result;
     }
 
     public ArrayList<Item> getAllAvailableItems() {
@@ -137,40 +106,43 @@ public class Player {
         return keys;
     }
 
-    public ArrayList<Uncover> getAllUncovers() {
-        ArrayList<Uncover> uncovers = new ArrayList<>();
-        for (Item item : this.getAllAvailableItems()) {
+    public HashSet<Uncover> getAvailableUncovers() {
+        HashSet<Uncover> uncovers = new HashSet<>();
+        for (Item item : this.getAllNotes()) {
             if (item instanceof Uncover) {
                 uncovers.add((Uncover) item);
             }
         }
+
+        if (!this.leftHand.getContents().isEmpty()) {
+            Item leftHandItem = this.leftHand.getContents().get(this.leftHand.getContents().keySet().iterator().next());
+            if (leftHandItem instanceof Uncover) {
+                uncovers.add((Uncover) leftHandItem);
+            }
+        }
+
+        if (!this.rightHand.getContents().isEmpty()) {
+            Item rightHandItem = this.rightHand.getContents().get(this.rightHand.getContents().keySet().iterator().next());
+            if (rightHandItem instanceof Uncover) {
+                uncovers.add((Uncover) rightHandItem);
+            }
+        }
+
         return uncovers;
     }
 
-    public void printAllFurnitureAndItems() {
-        if (this.knownFurniture == null) {
-            throw new RuntimeException("You have not yet scanned this room.");
-        }
-
-        if (this.knownFurniture.isEmpty()) {
-            throw new RuntimeException("There is nothing to be found");
-        }
-
+    public void printAllUncoveredFurnitureAndItems() {
+        HashSet<Furniture> uncoveredFurniture = this.currentRoom.getUncoveredFurniture();
         System.out.println("Furniture:");
-        int i = 1;
-        for (Furniture furniture : this.knownFurniture) {
-            System.out.printf("%s: %s\n", i, furniture.getName());
-            i++;
-        }
+        uncoveredFurniture.forEach((furniture) -> {
+            System.out.printf("%s:\t%s\n", furniture.getFurnitureID(), furniture.getName());
+        });
 
-        if (this.knownItems != null && !this.knownItems.isEmpty()) {
-            System.out.println("Items:");
-            i = 1;
-            for (Item item : this.knownItems) {
-                System.out.printf("%s: %s\n", i, item.getName());
-                i++;
-            }
-        }
+        HashSet<Item> uncoveredItems = this.currentRoom.getUncoveredItems();
+        System.out.println("\nItem:");
+        uncoveredItems.forEach((item) -> {
+            System.out.printf("%s:\t%s\n", item.getItemID(), item.getName());
+        });
     }
 
     public Item getKnownItem(int itemID) {
@@ -220,42 +192,41 @@ public class Player {
         }
 
         this.currentRoom = room;
-        this.setX(room.getX());
-        this.setY(room.getY());
 
         room.enter();
     }
 
     public void scan() {
         currentRoom.scan();
-        this.knownFurniture = currentRoom.getScannedFurniture();
-        this.knownItems = currentRoom.getScannedFloorItems();
     }
 
-    public void check(String furnitureID) {
-        int i = 1;
-        for (Furniture furniture : this.knownFurniture) {
-            if (String.valueOf(i).equals(furnitureID)) {
-                furniture.check(this.getAllUncovers());
-                HashSet<Item> checkedItems = furniture.getCheckedItems();
+    public void check(int furnitureID) {
+        for (Furniture furniture : currentRoom.getUncoveredFurniture()) {
+            if (furniture.getFurnitureID() == furnitureID) {
+                System.out.printf("You inspect the %s closer\n", furniture.getName());
+
+                furniture.check(this.getAvailableUncovers());
+                HashSet<Item> checkedItems = furniture.getUncoveredItems();
                 this.knownItems.addAll(checkedItems);
                 if (checkedItems.isEmpty()) {
-                    System.out.println("You did not find anything worth wile");
+                    System.out.println("You did not find anything worthwhile");
                 }
                 else {
                     System.out.println("You found some items:");
-                    printAllFurnitureAndItems();
+                    printAllUncoveredFurnitureAndItems();
                 }
                 return;
             }
-            i++;
         }
 
         throw new InputMismatchException("No furniture with the given ID was found");
     }
 
     public String take(int itemID) {
-        Item item = getKnownItem(itemID);
+        Item item = currentRoom.take(itemID);
+        if (item == null) {
+            return null;
+        }
 
         if (item instanceof Backpack) {
             setBackpack((Backpack) item);
@@ -268,12 +239,12 @@ public class Player {
         else {
             try {
                 rightHand.stashItem(item);
-                return "right";
+                return "right hand";
             }
             catch(IllegalStateException e) {
                 try {
                     leftHand.stashItem(item);
-                    return "left";
+                    return "left hand";
                 }
                 catch(IllegalStateException ex) {
                     throw new RuntimeException("Cannot take anything while your hand are full.");
@@ -334,7 +305,7 @@ public class Player {
         this.backpack.stashItem(item);
     }
 
-    public void fetch(String itemID) {
+    public void fetch(Integer itemID) {
         if (this.leftHand.getContents().isEmpty() &&  this.rightHand.getContents().isEmpty()) {
             throw new IllegalStateException("You cannot fetch anything from the backpack if you have no free hand");
         }

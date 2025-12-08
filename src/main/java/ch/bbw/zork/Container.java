@@ -9,11 +9,11 @@ import ch.bbw.zork.interfaces.Uncover;
 import java.util.*;
 
 public class Container implements Storage, HidingSpot {
-    private final String storageID;
+    private String storageID;
     private final String name;
     private final String storageObjectName;
     private final String roomName;
-    private final HashMap<String, Item> contents;
+    private final HashMap<Integer, Item> contents;
     private final int spaceLimit;
     private final int slots;
     private final double weightLimit;
@@ -35,13 +35,12 @@ public class Container implements Storage, HidingSpot {
         this.storageObjectName = storageObjectName;
         this.roomName = roomName;
         this.contents = new HashMap<>();
-        this.storageID = UUID.randomUUID().toString();
         this.slots = slots;
         this.checkedItems = new ArrayList<>();
     }
 
     @Override
-    public HashMap<String, Item> getContents() {
+    public HashMap<Integer, Item> getContents() {
         return this.contents;
     }
 
@@ -66,8 +65,15 @@ public class Container implements Storage, HidingSpot {
     }
 
     @Override
-    public Item fetchItem(String id) {
-        Item item = contents.get(id);
+    public Item fetchItem(int id) {
+        Item item = null;
+//        Item item = contents.get(id);
+        for (Item i : this.contents.values()) {
+            if (i.getItemID() == id) {
+                item = i;
+                break;
+            }
+        }
         if (item == null) {
             throw new InputMismatchException("There is no item with the provided id");
         }
@@ -103,7 +109,7 @@ public class Container implements Storage, HidingSpot {
 
     public int getAvailableSpace() {
         int usedSpace = 0;
-        for (String id : contents.keySet()) {
+        for (int id : contents.keySet()) {
             Item item = contents.get(id);
             usedSpace += item.getSpace();
         }
@@ -113,7 +119,7 @@ public class Container implements Storage, HidingSpot {
 
     public double getAvailableWeight() {
         double usedWeight = 0;
-        for (String id : contents.keySet()) {
+        for (int id : contents.keySet()) {
             Item item = contents.get(id);
             usedWeight += item.getWeight();
         }
@@ -121,17 +127,15 @@ public class Container implements Storage, HidingSpot {
         return this.getWeightLimit() - usedWeight;
     }
 
-    public ArrayList<Item> check(ArrayList<Uncover> uncovers) {
-        ArrayList<Item> uncoveredItems = new ArrayList<>();
+    public void check(HashSet<Uncover> uncovers) {
         for (Item item : getContents().values()) {
             item.tryUncover(uncovers);
-            if (item.isUncovered()) {
-                uncoveredItems.add(item);
-            }
+//            if (item.isUncovered()) {
+//                uncoveredItems.add(item);
+//            }
         }
 
-        this.checkedItems = uncoveredItems;
-        return uncoveredItems;
+//        this.checkedItems = uncoveredItems;
     }
 
     public String getStorageID() {
@@ -146,8 +150,16 @@ public class Container implements Storage, HidingSpot {
         this.lock = lock;
     }
 
-    public ArrayList<Item> getCheckedItems() {
-        return checkedItems;
+    public HashSet<Item> getCheckedItems() {
+        HashSet<Item> result = new HashSet<>();
+
+        for (Item item: contents.values()) {
+            if (item.isUncovered()) {
+                result.add(item);
+            }
+        }
+
+        return result;
     }
 
     public void removeItem(Item item) {
@@ -165,13 +177,11 @@ public class Container implements Storage, HidingSpot {
         }
 
         Item hiddenItem = (Item) hiddenObject;
-
-
     }
 
     @Override
     public void tryUncoverHiddenItems(Uncover uncover) {
-
+        // TODO: Implement Method
     }
 
     @Override
@@ -187,5 +197,9 @@ public class Container implements Storage, HidingSpot {
     @Override
     public String getRoomName() {
         return roomName;
+    }
+
+    public void setStorageID(String storageID) {
+        this.storageID = storageID;
     }
 }

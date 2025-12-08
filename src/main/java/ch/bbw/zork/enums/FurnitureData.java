@@ -618,27 +618,6 @@ public enum FurnitureData {
         return description;
     }
 
-    public int getMax(RoomData roomData) {
-        try {
-            return this.maxPerRoom.get(roomData);
-        }
-        catch(NullPointerException e) {
-            return 0;
-        }
-    }
-
-    public ArrayList<ItemData> validItemsInContainers(String container) {
-        ArrayList<ItemData> validItems = new ArrayList<>();
-        for (int i = 0; i < this.containerNames.length; i++) {
-            if (this.containerNames[i].equals(container)) {
-                validItems.addAll(Arrays.asList(this.containerValidItems[i]));
-                break;
-            }
-        }
-
-        return validItems;
-    }
-
     public String getHidingSpot() {
         return safeHidingSpot;
     }
@@ -648,16 +627,6 @@ public enum FurnitureData {
             return new ArrayList<>();
         }
         return new ArrayList<>(Arrays.asList(this.containerNames));
-    }
-
-    public boolean getContainerCanBeLocked(String containerName) {
-        for (int i = 0; i < this.containerNames.length; i++) {
-            if (this.containerNames[i].equalsIgnoreCase(containerName)) {
-                return this.containerCanBeLocked[i];
-            }
-        }
-
-        throw new RuntimeException("Invalid container name: " + containerName);
     }
 }
 

@@ -40,7 +40,8 @@ public class Game {
         }
 
         Room frontYard = house.getRoom(RoomData.FRONT_YARD);
-        player.spawn(frontYard);
+        frontYard.setDiscovered(true);
+        player.setCurrentRoom(frontYard);
 
         if (Zork2.DEBUG) {
             System.out.println(house.getMap());
@@ -79,16 +80,12 @@ public class Game {
     }
 
     public void setSeed(int randomInt) {
-        seed = Parser.padLeft(Integer.toBinaryString(randomInt), '0', 30);
+        seed = Helper.padLeft(Integer.toBinaryString(randomInt), '0', 30);
         if (seed.length() > 30) {
             seed = seed.subSequence(seed.length()-31, seed.length()-1).toString();
         }
         int seedInt = Integer.parseInt(seed, 2);
         random = new Random(seedInt);
-    }
-
-    public static int getRemainingTime() {
-        return remainingTime;
     }
 
     public static void addTime(int time) {
@@ -105,9 +102,5 @@ public class Game {
 
     public static House getHouse() {
         return house;
-    }
-
-    public Parser getParser() {
-        return parser;
     }
 }

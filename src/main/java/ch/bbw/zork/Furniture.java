@@ -11,20 +11,18 @@ import ch.bbw.zork.interfaces.Hidden;
 import java.util.*;
 
 public class Furniture implements HidingSpot {
-    private final String furnitureID;
+    private int furnitureID;
 	private final String name;
 	private final String description;
 	private HashMap<String, Container> storage;
     private final FurnitureData furnitureData;
-    private final ArrayList<String> uncoverIDs;
     private final String roomName;
     private boolean uncovered;
+    private HashSet<Uncover> uncoverList;
     private Lock lock;
-    private HashSet<Item> checkedItems;
     private Safe safe;
 
     public Furniture(FurnitureData furnitureData, String roomName) {
-        this.furnitureID = UUID.randomUUID().toString();
         this.furnitureData = furnitureData;
         this.name = furnitureData.getName();
         this.description = furnitureData.getDescription();
@@ -36,8 +34,8 @@ public class Furniture implements HidingSpot {
                 this.storage.put(name.toLowerCase(), newCont);
             }
         }
-        this.uncoverIDs = new ArrayList<>();
-        this.checkedItems = new HashSet<>();
+
+        this.uncoverList = new HashSet<>();
 
         Game.getHouse().addFurniture(this);
     }
@@ -49,10 +47,6 @@ public class Furniture implements HidingSpot {
     public String getDescription() {
 		return description;
 	}
-
-    public Container getContainer(String containerName) {
-        return this.storage.get(containerName);
-    }
 
     public Container getContainer() {
         if (this.storage.size() > 1) {
@@ -91,21 +85,23 @@ public class Furniture implements HidingSpot {
         this.lock = lock;
     }
 
-    public String getFurnitureID() {
-        return furnitureID;
-    }
-
     public FurnitureData getFurnitureData() {
         return furnitureData;
     }
 
-    public HashSet<Item> getCheckedItems() {
-        return checkedItems;
+    public HashSet<Item> getUncoveredItems() {
+        HashSet<Item> result = new HashSet<>();
+        if (this.storage != null) {
+            for (Container container : storage.values()) {
+                result.addAll(container.getCheckedItems());
+            }
+        }
+
+        return result;
     }
 
-    public void check(ArrayList<Uncover> uncovers) {
+    public void check(HashSet<Uncover> uncovers) {
         if (this.storage == null || this.storage.isEmpty()) {
-//            System.err.println("Nothing to see here");
             return;
         }
 
@@ -148,37 +144,6 @@ public class Furniture implements HidingSpot {
         }
 
         container.check(uncovers);
-        if (container.getCheckedItems().isEmpty()) {
-            System.out.println("There is nothing to be found");
-            return;
-        }
-
-        this.checkedItems.addAll(container.getCheckedItems());
-
-
-//        System.out.println("Found some items:");
-
-//        Player player = Game.getPlayer();
-//
-//        HashMap<Integer, Item> itemList = new HashMap<>();
-//        int i = 0;
-//        for (String itemName : container.getContents().keySet()) {
-//            Item item = container.getContents().get(itemName);
-//            if (!item.getIsUncovered()) {
-//                for (Uncover uncover : player.getAllUncovers()) {
-//                    if (item.tryUncover(uncover.getUncoverID())) {
-//                        break;
-//                    }
-//                }
-//            }
-//
-//            if (item.getIsUncovered()) {
-//                System.out.printf("%s: %s", i, itemName);
-//                itemList.put(i++, item);
-//            }
-//        }
-//
-//        Game.getParser().setLoadedItemList(itemList);
     }
 
     private ArrayList<Container> getContainersShuffled() {
@@ -244,7 +209,7 @@ public class Furniture implements HidingSpot {
 
     @Override
     public void tryUncoverHiddenItems(Uncover uncover) {
-
+        // TODO: Implement Method
     }
 
     @Override
@@ -260,5 +225,39 @@ public class Furniture implements HidingSpot {
     @Override
     public String getHidingSpotDescription() {
         return this.furnitureData.getHidingSpot();
+    }
+
+    public int getFurnitureID() {
+        return furnitureID;
+    }
+
+    public void setFurnitureID(int furnitureID) {
+        this.furnitureID = furnitureID;
+    }
+
+    public boolean isUncovered() {
+        return uncovered;
+    }
+
+    public void setUncovered(boolean uncovered) {
+        this.uncovered = uncovered;
+    }
+
+    public void addUncoverItem(Uncover uncoverItem) {
+        this.uncoverList.add(uncoverItem);
+    }
+
+    public void tryUncover(HashSet<Uncover> uncovers) {
+        if (this.uncoverList.isEmpty()) {
+            this.uncovered = true;
+        }
+        else {
+            for (Uncover uncover : uncovers) {
+                if (uncoverList.contains(uncover)) {
+                    this.uncovered = true;
+                    return;
+                }
+            }
+        }
     }
 }
